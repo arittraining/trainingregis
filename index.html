@@ -1,890 +1,792 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, MapPin, Users, BookOpen, User, CheckCircle, 
-  XCircle, Clock, Search, LogIn, LogOut, Plus, Trash2, Edit, AlertCircle, Download, UserPlus, FileSpreadsheet
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMUTL Training Registration</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-// --- MOCK DATA (จำลอง Database) ---
-const initialCourses = [
-  {
-    courseId: 'c1', title: 'การพัฒนา Web Application ด้วย React ขั้นพื้นฐาน', speaker: 'อ.สมชาย ใจดี',
-    date: '2026-04-10', location: 'ห้องปฏิบัติการคอมพิวเตอร์ 1', targetGroup: 'นักศึกษาและบุคลากร',
-    content: 'เรียนรู้พื้นฐาน React, State, Props, Hooks', objective: 'เพื่อสร้างหน้าเว็บแบบ SPA ได้', note: 'เตรียม Notebook มาด้วย',
-    openDate: '2026-03-01', closeDate: '2026-04-05', maxAttendees: 30,
-    confirmOpenDate: '2026-04-06', confirmCloseDate: '2026-04-09'
-  },
-  {
-    courseId: 'c2', title: 'การใช้ AI เพื่อการศึกษา', speaker: 'ดร.สมศรี เรียนเก่ง',
-    date: '2026-04-15', location: 'ห้องประชุมใหญ่ อาคาร A', targetGroup: 'บุคลากร',
-    content: 'Prompt Engineering, การใช้ Gemini เบื้องต้น', objective: 'ประยุกต์ใช้ AI ในการทำงาน', note: '-',
-    openDate: '2026-03-01', closeDate: '2026-03-10', maxAttendees: 2,
-    confirmOpenDate: '2026-03-11', confirmCloseDate: '2026-04-14'
-  }
-];
+  <style>
+    body { font-family: 'Kanit', sans-serif; }
+    /* ซ่อน Scrollbar สำหรับความสวยงาม (ถ้าต้องการ) */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-const initialRegs = [
-  {
-    regId: 'r1', courseId: 'c2', prefix: 'นาย', fullName: 'ทดสอบ ระบบ', type: 'บุคลากร',
-    email: 'test@rmutl.ac.th', campus: 'เชียงใหม่', faculty: 'คณะวิศวกรรมศาสตร์', phone: '0812345678', allergy: '-', status: 'รอยืนยัน'
-  }
-];
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect } from 'https://esm.sh/react@18';
+    import { createRoot } from 'https://esm.sh/react-dom@18/client';
+    import { 
+      Calendar, MapPin, Users, BookOpen, User, CheckCircle, 
+      XCircle, Clock, Search, LogIn, LogOut, Plus, Trash2, Edit, AlertCircle, Download, UserPlus, FileSpreadsheet, Phone, Mail, Globe
+    } from 'https://esm.sh/lucide-react';
 
-// --- MAIN APP COMPONENT ---
-export default function App() {
-  const [currentView, setCurrentView] = useState('dashboard'); 
-  const [courses, setCourses] = useState(initialCourses);
-  const [registrations, setRegistrations] = useState(initialRegs);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [isAdminAuth, setIsAdminAuth] = useState(false);
+    // --- MOCK DATA (จำลอง Database) ---
+    const initialCourses = [
+      {
+        courseId: 'c1', title: 'การพัฒนา Web Application ด้วย React ขั้นพื้นฐาน', speaker: 'อ.สมชาย ใจดี',
+        date: '2026-04-10', location: 'ห้องปฏิบัติการคอมพิวเตอร์ 1', targetGroup: 'นักศึกษาและบุคลากร',
+        content: 'เรียนรู้พื้นฐาน React, State, Props, Hooks', objective: 'เพื่อสร้างหน้าเว็บแบบ SPA ได้', note: 'เตรียม Notebook มาด้วย',
+        openDate: '2026-03-01', closeDate: '2026-04-05', maxAttendees: 30,
+        confirmOpenDate: '2026-04-06', confirmCloseDate: '2026-04-09'
+      },
+      {
+        courseId: 'c2', title: 'การใช้ AI เพื่อการศึกษา', speaker: 'ดร.สมศรี เรียนเก่ง',
+        date: '2026-04-15', location: 'ห้องประชุมใหญ่ อาคาร A', targetGroup: 'บุคลากร',
+        content: 'Prompt Engineering, การใช้ Gemini เบื้องต้น', objective: 'ประยุกต์ใช้ AI ในการทำงาน', note: '-',
+        openDate: '2026-03-01', closeDate: '2026-03-10', maxAttendees: 2,
+        confirmOpenDate: '2026-03-11', confirmCloseDate: '2026-04-14'
+      }
+    ];
 
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, []);
+    const initialRegs = [
+      {
+        regId: 'r1', courseId: 'c2', prefix: 'นาย', fullName: 'ทดสอบ ระบบ', type: 'บุคลากร',
+        email: 'test@rmutl.ac.th', campus: 'เชียงใหม่', faculty: 'คณะวิศวกรรมศาสตร์', phone: '0812345678', allergy: '-', status: 'รอยืนยัน'
+      }
+    ];
 
-  const navigate = (view, data = null) => {
-    setCurrentView(view);
-    if (data) setSelectedCourse(data);
-    else if (view === 'dashboard' || view === 'admin') setSelectedCourse(null);
-    window.scrollTo(0, 0);
-  };
-
-  const getCourseStatus = (course) => {
-    const today = new Date().toISOString().split('T')[0];
-    const regCount = registrations.filter(r => r.courseId === course.courseId && r.status !== 'ยกเลิก').length;
-    
-    if (today < course.openDate) return { label: 'ยังไม่เปิดรับสมัคร', color: 'bg-gray-100 text-gray-600', code: 'WAITING' };
-    if (today > course.closeDate) return { label: 'ปิดรับสมัครแล้ว', color: 'bg-red-100 text-red-600', code: 'CLOSED' };
-    if (regCount >= course.maxAttendees) return { label: 'เต็มแล้ว', color: 'bg-orange-100 text-orange-600', code: 'FULL' };
-    return { label: 'เปิดรับสมัคร', color: 'bg-green-100 text-green-600', code: 'OPEN' };
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800" style={{ fontFamily: "'Kanit', sans-serif" }}>
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('dashboard')}>
-            <BookOpen className="text-indigo-600" />
-            <span className="font-semibold text-xl tracking-tight text-indigo-900">RMUTL <span className="text-slate-500 font-normal">Training</span></span>
+    // --- FOOTER COMPONENT ---
+    function Footer() {
+      return (
+        <footer className="bg-slate-900 text-slate-300 py-10 mt-auto border-t border-slate-800 w-full">
+          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">สำนักวิทยบริการและเทคโนโลยีสารสนเทศ</h3>
+              <p className="text-sm leading-relaxed text-slate-400">
+                มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา<br />
+                128 ถ.ห้วยแก้ว ต.ช้างเผือก อ.เมือง<br />
+                จ.เชียงใหม่ 50300
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">ติดต่อเรา</h3>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex items-center gap-3"><Phone size={16} className="text-slate-500" /> 0 5392 1444 ต่อ 1622</li>
+                <li className="flex items-center gap-3"><Mail size={16} className="text-slate-500" /> arit@rmutl.ac.th</li>
+                <li className="flex items-center gap-3"><Globe size={16} className="text-slate-500" /> https://arit.rmutl.ac.th</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">เกี่ยวกับระบบ</h3>
+              <p className="text-sm leading-relaxed text-slate-400">
+                ระบบลงทะเบียนอบรม / สัมมนาออนไลน์<br />
+                ให้บริการสำหรับบุคลากรและนักศึกษา<br />
+                มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา
+              </p>
+            </div>
           </div>
-          <div className="flex gap-4">
-            <button onClick={() => navigate('dashboard')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'dashboard' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>หน้าหลัก</button>
-            {isAdminAuth ? (
-              <>
-                <button onClick={() => navigate('admin')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'admin' || currentView === 'adminAttendees' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>จัดการระบบ</button>
-                <button onClick={() => { setIsAdminAuth(false); navigate('dashboard'); }} className="flex items-center gap-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"><LogOut size={18}/> ออกจากระบบ</button>
-              </>
-            ) : (
-              <button onClick={() => navigate('adminLogin')} className="flex items-center gap-1 px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"><LogIn size={18}/> Admin</button>
-            )}
+          <div className="max-w-6xl mx-auto px-4 mt-8 pt-8 border-t border-slate-800 text-sm text-center text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+            <span>© {new Date().getFullYear()} RMUTL Training Registration System. All rights reserved.</span>
+            <span className="text-xs">พัฒนาโดย ARIT RMUTL</span>
           </div>
-        </div>
-      </nav>
+        </footer>
+      );
+    }
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {currentView === 'dashboard' && <DashboardView courses={courses} getStatus={getCourseStatus} onRegister={(c) => navigate('register', c)} onCheckList={(c) => navigate('attendees', c)} />}
-        {currentView === 'register' && <RegisterView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('dashboard')} />}
-        {currentView === 'attendees' && <AttendeesView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('dashboard')} />}
-        {currentView === 'adminLogin' && <AdminLogin onLogin={() => { setIsAdminAuth(true); navigate('admin'); }} onBack={() => navigate('dashboard')} />}
-        {currentView === 'admin' && isAdminAuth && <AdminDashboard courses={courses} setCourses={setCourses} regs={registrations} onManageRegs={(c) => navigate('adminAttendees', c)} />}
-        {currentView === 'adminAttendees' && isAdminAuth && <AdminAttendeesView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('admin')} />}
-      </main>
-    </div>
-  );
-}
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      const [currentView, setCurrentView] = useState('dashboard'); 
+      const [courses, setCourses] = useState(initialCourses);
+      const [registrations, setRegistrations] = useState(initialRegs);
+      const [selectedCourse, setSelectedCourse] = useState(null);
+      const [isAdminAuth, setIsAdminAuth] = useState(false);
 
-// --- VIEWS ---
+      const navigate = (view, data = null) => {
+        setCurrentView(view);
+        if (data) setSelectedCourse(data);
+        else if (view === 'dashboard' || view === 'admin') setSelectedCourse(null);
+        window.scrollTo(0, 0);
+      };
 
-function DashboardView({ courses, getStatus, onRegister, onCheckList }) {
-  const [selectedDetails, setSelectedDetails] = useState(null);
+      const getCourseStatus = (course) => {
+        const today = new Date().toISOString().split('T')[0];
+        const regCount = registrations.filter(r => r.courseId === course.courseId && r.status !== 'ยกเลิก').length;
+        
+        if (today < course.openDate) return { label: 'ยังไม่เปิดรับสมัคร', color: 'bg-gray-100 text-gray-600', code: 'WAITING' };
+        if (today > course.closeDate) return { label: 'ปิดรับสมัครแล้ว', color: 'bg-red-100 text-red-600', code: 'CLOSED' };
+        if (regCount >= course.maxAttendees) return { label: 'เต็มแล้ว', color: 'bg-orange-100 text-orange-600', code: 'FULL' };
+        return { label: 'เปิดรับสมัคร', color: 'bg-green-100 text-green-600', code: 'OPEN' };
+      };
 
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-semibold text-slate-800 mb-2">ระบบลงทะเบียนอบรม / สัมมนา</h1>
-        <p className="text-slate-500">เลือกหลักสูตรที่เปิดรับสมัครด้านล่างเพื่อทำการลงทะเบียน</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map(course => {
-          const status = getStatus(course);
-          return (
-            <div key={course.courseId} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col h-full">
-              <div className="flex justify-between items-start mb-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span>
-                <span className="text-xs text-slate-400 flex items-center gap-1"><Users size={14}/> รับ {course.maxAttendees} คน</span>
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+          <nav className="bg-white shadow-sm sticky top-0 z-50">
+            <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('dashboard')}>
+                <BookOpen className="text-indigo-600" />
+                <span className="font-semibold text-xl tracking-tight text-indigo-900">RMUTL <span className="text-slate-500 font-normal">Training</span></span>
               </div>
-              <h3 className="text-lg font-semibold mb-2 line-clamp-2">{course.title}</h3>
-              <div className="space-y-2 text-sm text-slate-600 mb-6 flex-grow">
-                <p className="flex items-center gap-2"><Calendar size={16} className="text-slate-400"/> {new Date(course.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p className="flex items-center gap-2"><MapPin size={16} className="text-slate-400"/> {course.location}</p>
-                <p className="flex items-center gap-2"><User size={16} className="text-slate-400"/> วิทยากร: {course.speaker}</p>
-              </div>
-              
-              <div className="flex flex-col gap-2 mt-auto">
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => setSelectedDetails(course)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors">รายละเอียด</button>
-                  <button onClick={() => onCheckList(course)} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-medium transition-colors">ตรวจสอบรายชื่อ</button>
-                </div>
-                {status.code === 'OPEN' ? (
-                  <button onClick={() => onRegister(course)} className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">ลงทะเบียน</button>
+              <div className="flex gap-4">
+                <button onClick={() => navigate('dashboard')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'dashboard' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>หน้าหลัก</button>
+                {isAdminAuth ? (
+                  <>
+                    <button onClick={() => navigate('admin')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'admin' || currentView === 'adminAttendees' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>จัดการระบบ</button>
+                    <button onClick={() => { setIsAdminAuth(false); navigate('dashboard'); }} className="flex items-center gap-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"><LogOut size={18}/> ออกจากระบบ</button>
+                  </>
                 ) : (
-                  <button disabled className="w-full px-4 py-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">ไม่สามารถลงทะเบียนได้</button>
+                  <button onClick={() => navigate('adminLogin')} className="flex items-center gap-1 px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"><LogIn size={18}/> Admin</button>
                 )}
               </div>
             </div>
-          );
-        })}
-      </div>
+          </nav>
 
-      {selectedDetails && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-semibold text-slate-800">{selectedDetails.title}</h2>
-              <button onClick={() => setSelectedDetails(null)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500"><XCircle size={24}/></button>
-            </div>
-            <div className="space-y-4 text-slate-600">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl">
-                <div><span className="font-medium text-slate-800">วิทยากร:</span> {selectedDetails.speaker}</div>
-                <div><span className="font-medium text-slate-800">วันที่:</span> {selectedDetails.date}</div>
-                <div><span className="font-medium text-slate-800">สถานที่:</span> {selectedDetails.location}</div>
-                <div><span className="font-medium text-slate-800">กลุ่มเป้าหมาย:</span> {selectedDetails.targetGroup}</div>
-                <div><span className="font-medium text-slate-800">เปิดรับสมัคร:</span> {selectedDetails.openDate} ถึง {selectedDetails.closeDate}</div>
-              </div>
-              <div><span className="font-medium text-slate-800 block mb-1">เนื้อหาการอบรม:</span><p className="bg-slate-50 p-3 rounded-lg whitespace-pre-wrap">{selectedDetails.content}</p></div>
-              <div><span className="font-medium text-slate-800 block mb-1">วัตถุประสงค์:</span><p className="bg-slate-50 p-3 rounded-lg">{selectedDetails.objective}</p></div>
-              <div><span className="font-medium text-slate-800 block mb-1">หมายเหตุ:</span><p className="bg-slate-50 p-3 rounded-lg text-orange-600">{selectedDetails.note || '-'}</p></div>
-              
-              <div className="pt-4 border-t border-slate-100 flex gap-3">
-                <button className="flex items-center justify-center gap-2 flex-1 px-4 py-3 bg-white border border-indigo-200 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors">
-                  <Download size={18}/> ดาวน์โหลดเอกสารโครงการ
-                </button>
-                {getStatus(selectedDetails).code === 'OPEN' && (
-                  <button onClick={() => { onRegister(selectedDetails); setSelectedDetails(null); }} className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors shadow-sm">
-                    ไปหน้าลงทะเบียน
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <main className="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
+            {currentView === 'dashboard' && <DashboardView courses={courses} getStatus={getCourseStatus} onRegister={(c) => navigate('register', c)} onCheckList={(c) => navigate('attendees', c)} />}
+            {currentView === 'register' && <RegisterView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('dashboard')} />}
+            {currentView === 'attendees' && <AttendeesView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('dashboard')} />}
+            {currentView === 'adminLogin' && <AdminLogin onLogin={() => { setIsAdminAuth(true); navigate('admin'); }} onBack={() => navigate('dashboard')} />}
+            {currentView === 'admin' && isAdminAuth && <AdminDashboard courses={courses} setCourses={setCourses} regs={registrations} onManageRegs={(c) => navigate('adminAttendees', c)} />}
+            {currentView === 'adminAttendees' && isAdminAuth && <AdminAttendeesView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('admin')} />}
+          </main>
+
+          <Footer />
         </div>
-      )}
-    </div>
-  );
-}
-
-function RegisterView({ course, regs, setRegs, onBack }) {
-  const defaultForm = {
-    prefix: '', fullName: '', type: '', email: '', campus: '',
-    faculty: '', facultyOther: '', phone: '', allergy: '', pdpa: false
-  };
-  const [formData, setFormData] = useState(defaultForm);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-
-  useEffect(() => { setFormData(defaultForm); setError(''); setSuccess(false); }, [course]);
-
-  if (!course) return null;
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const validateForm = () => {
-    if (!formData.prefix || !formData.fullName || !formData.type || !formData.email || !formData.campus || !formData.faculty || !formData.phone) {
-      return 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน';
+      );
     }
-    if (formData.faculty === 'อื่นๆ โปรดระบุ' && !formData.facultyOther) return 'กรุณาระบุคณะ/หน่วยงาน';
-    
-    const emailDomain = formData.email.split('@')[1];
-    if (formData.type === 'บุคลากร' && emailDomain !== 'rmutl.ac.th') return 'บุคลากรต้องใช้อีเมล @rmutl.ac.th เท่านั้น';
-    if (formData.type === 'นักศึกษา' && emailDomain !== 'live.rmutl.ac.th') return 'นักศึกษาต้องใช้อีเมล @live.rmutl.ac.th เท่านั้น';
-    
-    if (!formData.pdpa) return 'กรุณายอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล (PDPA)';
-    return null;
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationError = validateForm();
-    if (validationError) { setError(validationError); return; }
+    // --- VIEWS COMPONENTS ---
 
-    const newReg = {
-      regId: 'r' + Date.now(),
-      courseId: course.courseId,
-      ...formData,
-      faculty: formData.faculty === 'อื่นๆ โปรดระบุ' ? formData.facultyOther : formData.faculty,
-      status: 'รอยืนยัน',
-      timestamp: new Date().toISOString()
-    };
+    function DashboardView({ courses, getStatus, onRegister, onCheckList }) {
+      const [selectedDetails, setSelectedDetails] = useState(null);
 
-    setRegs([...regs, newReg]);
-    setSuccess(true);
-    setFormData(defaultForm);
-  };
-
-  if (success) {
-    return (
-      <div className="max-w-md mx-auto mt-10 text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-100 animate-in zoom-in-95">
-        <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle size={32}/></div>
-        <h2 className="text-2xl font-semibold mb-2 text-slate-800">ลงทะเบียนสำเร็จ</h2>
-        <p className="text-slate-500 mb-6">ระบบได้บันทึกข้อมูลการลงทะเบียนของคุณแล้ว กรุณาตรวจสอบสถานะในหน้า "ตรวจสอบรายชื่อ"</p>
-        <button onClick={onBack} className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">กลับหน้าหลัก</button>
-      </div>
-    );
-  }
-
-  const campuses = ['เชียงใหม่', 'เชียงราย', 'ลำปาง', 'ตาก', 'น่าน', 'พิษณุโลก'];
-  const faculties = ['คณะวิศวกรรมศาสตร์', 'คณะบริหารธุรกิจและศิลปศาสตร์', 'คณะศิลปกรรมและสถาปัตยกรรมศาสตร์', 'คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร', 'วิทยาลัยเทคโนโลยีและสหวิทยาการ', 'สำนักงานอธิการบดี', 'สำนักส่งเสริมวิชาการและงานทะเบียน', 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ', 'สถาบันถ่ายทอดเทคโนโลยีสู่ชุมชน', 'กองบริหารงานบุคคล', 'อื่นๆ โปรดระบุ'];
-
-  return (
-    <div className="max-w-2xl mx-auto bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
-      <div className="mb-8 border-b border-slate-100 pb-6">
-        <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-4 flex items-center gap-1">← กลับ</button>
-        <h1 className="text-2xl font-semibold text-slate-800 mb-2">ฟอร์มลงทะเบียน</h1>
-        <div className="bg-indigo-50 p-4 rounded-xl">
-          <h2 className="font-medium text-indigo-900">{course.title}</h2>
-          <p className="text-sm text-indigo-700 mt-1 flex items-center gap-2"><Calendar size={14}/> {course.date}</p>
-        </div>
-      </div>
-
-      {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-2 text-sm"><AlertCircle size={18}/> {error}</div>}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">คำนำหน้า *</label>
-            <select name="prefix" value={formData.prefix} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="">เลือก</option>
-              <option value="นาย">นาย</option>
-              <option value="นาง">นาง</option>
-              <option value="นางสาว">นางสาว</option>
-            </select>
+      return (
+        <div className="space-y-6">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-semibold text-slate-800 mb-2">ระบบลงทะเบียนอบรม / สัมมนา</h1>
+            <p className="text-slate-500">เลือกหลักสูตรที่เปิดรับสมัครด้านล่างเพื่อทำการลงทะเบียน</p>
           </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล *</label>
-            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="เช่น สมชาย ใจดี" />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">ประเภท *</label>
-            <select name="type" value={formData.type} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="">เลือกประเภท</option>
-              <option value="บุคลากร">บุคลากร</option>
-              <option value="นักศึกษา">นักศึกษา</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">อีเมล *</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder={formData.type === 'นักศึกษา' ? '@live.rmutl.ac.th' : '@rmutl.ac.th'} />
-            <p className="text-xs text-slate-400 mt-1">บุคลากร: @rmutl.ac.th / นักศึกษา: @live.rmutl.ac.th</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">เขตพื้นที่ *</label>
-            <select name="campus" value={formData.campus} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="">เลือกเขตพื้นที่</option>
-              {campuses.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ *</label>
-            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="08XXXXXXXX" />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">คณะ/หน่วยงาน *</label>
-          <select name="faculty" value={formData.faculty} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            <option value="">เลือกคณะ/หน่วยงาน</option>
-            {faculties.map(f => <option key={f} value={f}>{f}</option>)}
-          </select>
-        </div>
-
-        {formData.faculty === 'อื่นๆ โปรดระบุ' && (
-          <div className="animate-in slide-in-from-top-2">
-            <input type="text" name="facultyOther" value={formData.facultyOther} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="โปรดระบุหน่วยงานของคุณ" />
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label>
-          <input type="text" name="allergy" value={formData.allergy} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="เช่น อาหารทะเล, ถั่ว (เว้นว่างหากไม่มี)" />
-        </div>
-
-        <div className="bg-slate-50 p-4 rounded-xl mt-6 border border-slate-200">
-          <p className="text-sm font-medium text-slate-800 mb-2">การขอความยินยอม ใช้ข้อมูลส่วนบุคคล สำหรับการประชุม/อบรม/สัมมนา</p>
-          <p className="text-xs text-slate-500 mb-3 leading-relaxed">ข้อมูลที่ท่านกรอกจะถูกนำไปใช้เพื่อการบริหารจัดการโครงการ การติดต่อประสานงาน และการจัดทำรายงานสรุปผลการดำเนินงานเท่านั้น ตามพ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA)</p>
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" name="pdpa" checked={formData.pdpa} onChange={handleChange} className="mt-1 w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" />
-            <span className="text-sm text-slate-700">ข้าพเจ้าได้อ่านและยอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล</span>
-          </label>
-        </div>
-
-        <div className="flex gap-4 pt-4">
-          <button type="button" onClick={onBack} className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors">ยกเลิก</button>
-          <button type="submit" className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm">ยืนยันการลงทะเบียน</button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-// === หน้าตรวจสอบรายชื่อและจัดการข้อมูล ===
-function AttendeesView({ course, regs, setRegs, onBack }) {
-  const [editingReg, setEditingReg] = useState(null);
-  const [authEmail, setAuthEmail] = useState('');
-  const [isAuthed, setIsAuthed] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [editForm, setEditForm] = useState({ fullName: '', phone: '', allergy: '' });
-
-  if (!course) return null;
-  const courseRegs = regs.filter(r => r.courseId === course.courseId);
-
-  // ตรวจสอบช่วงเวลายืนยันเข้าร่วม
-  const today = new Date().toISOString().split('T')[0];
-  const isConfirmPeriod = course.confirmOpenDate && course.confirmCloseDate && 
-                          today >= course.confirmOpenDate && today <= course.confirmCloseDate;
-
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'เข้าร่วม': return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">เข้าร่วม</span>;
-      case 'ยกเลิก': return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium">ยกเลิก</span>;
-      default: return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">รอยืนยัน</span>;
-    }
-  };
-
-  const openEditModal = (reg) => {
-    setEditingReg(reg);
-    setAuthEmail('');
-    setIsAuthed(false);
-    setAuthError('');
-    setEditForm({ fullName: reg.fullName, phone: reg.phone, allergy: reg.allergy });
-  };
-
-  const closeEditModal = () => {
-    setEditingReg(null);
-  };
-
-  const handleVerify = (e) => {
-    e.preventDefault();
-    if (authEmail === editingReg.email) {
-      setIsAuthed(true);
-      setAuthError('');
-    } else {
-      setAuthError('อีเมลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
-    }
-  };
-
-  const handleSaveInfo = () => {
-    setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, ...editForm } : r));
-    setEditingReg({ ...editingReg, ...editForm });
-    alert('อัปเดตข้อมูลส่วนตัวสำเร็จ');
-  };
-
-  const updateStatus = (newStatus) => {
-    setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, status: newStatus } : r));
-    setEditingReg({ ...editingReg, status: newStatus });
-  };
-
-  return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 animate-in fade-in">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-2 flex items-center gap-1">← กลับ</button>
-          <h2 className="text-2xl font-semibold text-slate-800">รายชื่อผู้ลงทะเบียน</h2>
-          <p className="text-indigo-600 mt-1">{course.title}</p>
-        </div>
-        <div className="text-right bg-slate-50 p-3 rounded-xl">
-          <p className="text-sm text-slate-500 mb-1">จำนวนผู้ลงทะเบียน (ไม่รวมยกเลิก)</p>
-          <p className="text-2xl font-bold text-slate-800">{courseRegs.filter(r => r.status !== 'ยกเลิก').length} / {course.maxAttendees}</p>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
-        <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="bg-slate-50 text-slate-600">
-            <tr>
-              <th className="p-4 font-medium">ลำดับ</th>
-              <th className="p-4 font-medium">ชื่อ-นามสกุล</th>
-              <th className="p-4 font-medium">เขตพื้นที่</th>
-              <th className="p-4 font-medium">คณะ/หน่วยงาน</th>
-              <th className="p-4 font-medium">สถานะ</th>
-              <th className="p-4 font-medium text-center">จัดการข้อมูลส่วนตัว</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {courseRegs.length === 0 ? (
-              <tr><td colSpan="6" className="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>
-            ) : (
-              courseRegs.map((r, i) => (
-                <tr key={r.regId} className="hover:bg-slate-50/50">
-                  <td className="p-4 text-slate-500">{i + 1}</td>
-                  <td className="p-4 font-medium text-slate-800">{r.prefix}{r.fullName}</td>
-                  <td className="p-4 text-slate-600">{r.campus}</td>
-                  <td className="p-4 text-slate-600">{r.faculty}</td>
-                  <td className="p-4">{getStatusBadge(r.status)}</td>
-                  <td className="p-4 text-center">
-                    <button 
-                      onClick={() => openEditModal(r)} 
-                      className="p-2 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg transition-colors inline-flex items-center justify-center"
-                      title="จัดการข้อมูลส่วนตัว"
-                    >
-                      <Edit size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {editingReg && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-xl relative animate-in zoom-in-95">
-            <button onClick={closeEditModal} className="absolute top-4 right-4 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full p-1 transition-colors">
-              <XCircle size={24}/>
-            </button>
-            <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2"><Edit size={20} className="text-indigo-600"/> จัดการข้อมูลส่วนตัว</h3>
-
-            {!isAuthed ? (
-              <form onSubmit={handleVerify} className="space-y-4">
-                <div className="bg-indigo-50 p-4 rounded-xl mb-4">
-                  <p className="text-sm text-indigo-800">กรุณากรอกอีเมลที่ใช้ลงทะเบียนเพื่อยืนยันสิทธิ์ในการแก้ไขข้อมูลของ <b>{editingReg.prefix}{editingReg.fullName}</b></p>
-                </div>
-                <div>
-                  <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="อีเมลของคุณ" className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm" />
-                </div>
-                {authError && <p className="text-xs text-red-500">{authError}</p>}
-                <button type="submit" className="w-full p-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition-colors mt-2">ยืนยันตัวตน</button>
-              </form>
-            ) : (
-              <div className="space-y-6 animate-in slide-in-from-bottom-2">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">ชื่อ-นามสกุล</label>
-                    <input type="text" value={editForm.fullName} onChange={e => setEditForm({...editForm, fullName: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map(course => {
+              const status = getStatus(course);
+              return (
+                <div key={course.courseId} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1"><Users size={14}/> รับ {course.maxAttendees} คน</span>
                   </div>
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">เบอร์โทรศัพท์</label>
-                    <input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label>
-                    <input type="text" value={editForm.allergy} onChange={e => setEditForm({...editForm, allergy: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" />
-                  </div>
-                  <button onClick={handleSaveInfo} className="w-full p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 rounded-xl text-sm font-medium transition-colors mt-2">
-                    บันทึกข้อมูลส่วนตัว
-                  </button>
-                </div>
-
-                {/* ส่วนอัปเดตสถานะ */}
-                <div className="space-y-3 pt-4 border-t border-slate-100">
-                  <div className="flex justify-between items-end mb-2">
-                    <p className="text-sm font-medium text-slate-800">สถานะการเข้าร่วมกิจกรรม</p>
-                    <p className="text-xs text-slate-500 text-right">
-                      ช่วงยืนยัน:<br/>{course.confirmOpenDate || '-'} ถึง {course.confirmCloseDate || '-'}
-                    </p>
+                  <h3 className="text-lg font-semibold mb-2 line-clamp-2">{course.title}</h3>
+                  <div className="space-y-2 text-sm text-slate-600 mb-6 flex-grow">
+                    <p className="flex items-center gap-2"><Calendar size={16} className="text-slate-400"/> {new Date(course.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p className="flex items-center gap-2"><MapPin size={16} className="text-slate-400"/> {course.location}</p>
+                    <p className="flex items-center gap-2"><User size={16} className="text-slate-400"/> วิทยากร: {course.speaker}</p>
                   </div>
                   
-                  {editingReg.status === 'เข้าร่วม' ? (
-                    <div className="p-3 bg-green-50 text-green-700 text-sm rounded-xl flex items-center justify-center gap-2 border border-green-200 font-medium">
-                      <CheckCircle size={18}/> คุณได้ยืนยันการเข้าร่วมแล้ว
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button onClick={() => setSelectedDetails(course)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-colors">รายละเอียด</button>
+                      <button onClick={() => onCheckList(course)} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-medium transition-colors">ตรวจสอบรายชื่อ</button>
                     </div>
-                  ) : isConfirmPeriod ? (
-                    <button onClick={() => updateStatus('เข้าร่วม')} className="w-full p-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2 shadow-sm">
-                      <CheckCircle size={18}/> ยืนยันเข้าร่วมกิจกรรม
-                    </button>
-                  ) : (
-                    <button disabled className="w-full p-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium flex justify-center items-center gap-2 cursor-not-allowed">
-                      <Clock size={18}/> นอกช่วงเวลายืนยันเข้าร่วม
-                    </button>
-                  )}
-
-                  {editingReg.status !== 'ยกเลิก' && (
-                    <button onClick={() => updateStatus('ยกเลิก')} className="w-full p-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-colors flex justify-center items-center gap-2 mt-2">
-                      <XCircle size={18}/> ยกเลิกการลงทะเบียน
-                    </button>
-                  )}
+                    {status.code === 'OPEN' ? (
+                      <button onClick={() => onRegister(course)} className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">ลงทะเบียน</button>
+                    ) : (
+                      <button disabled className="w-full px-4 py-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">ไม่สามารถลงทะเบียนได้</button>
+                    )}
+                  </div>
                 </div>
+              );
+            })}
+          </div>
 
+          {selectedDetails && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-start mb-6">
+                  <h2 className="text-2xl font-semibold text-slate-800">{selectedDetails.title}</h2>
+                  <button onClick={() => setSelectedDetails(null)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500"><XCircle size={24}/></button>
+                </div>
+                <div className="space-y-4 text-slate-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl">
+                    <div><span className="font-medium text-slate-800">วิทยากร:</span> {selectedDetails.speaker}</div>
+                    <div><span className="font-medium text-slate-800">วันที่:</span> {selectedDetails.date}</div>
+                    <div><span className="font-medium text-slate-800">สถานที่:</span> {selectedDetails.location}</div>
+                    <div><span className="font-medium text-slate-800">กลุ่มเป้าหมาย:</span> {selectedDetails.targetGroup}</div>
+                    <div><span className="font-medium text-slate-800">เปิดรับสมัคร:</span> {selectedDetails.openDate} ถึง {selectedDetails.closeDate}</div>
+                  </div>
+                  <div><span className="font-medium text-slate-800 block mb-1">เนื้อหาการอบรม:</span><p className="bg-slate-50 p-3 rounded-lg whitespace-pre-wrap">{selectedDetails.content}</p></div>
+                  <div><span className="font-medium text-slate-800 block mb-1">วัตถุประสงค์:</span><p className="bg-slate-50 p-3 rounded-lg">{selectedDetails.objective}</p></div>
+                  <div><span className="font-medium text-slate-800 block mb-1">หมายเหตุ:</span><p className="bg-slate-50 p-3 rounded-lg text-orange-600">{selectedDetails.note || '-'}</p></div>
+                  
+                  <div className="pt-4 border-t border-slate-100 flex gap-3">
+                    <button className="flex items-center justify-center gap-2 flex-1 px-4 py-3 bg-white border border-indigo-200 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors">
+                      <Download size={18}/> ดาวน์โหลดเอกสารโครงการ
+                    </button>
+                    {getStatus(selectedDetails).code === 'OPEN' && (
+                      <button onClick={() => { onRegister(selectedDetails); setSelectedDetails(null); }} className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors shadow-sm">
+                        ไปหน้าลงทะเบียน
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function RegisterView({ course, regs, setRegs, onBack }) {
+      const defaultForm = {
+        prefix: '', fullName: '', type: '', email: '', campus: '',
+        faculty: '', facultyOther: '', phone: '', allergy: '', pdpa: false
+      };
+      const [formData, setFormData] = useState(defaultForm);
+      const [error, setError] = useState('');
+      const [success, setSuccess] = useState(false);
+
+      useEffect(() => { setFormData(defaultForm); setError(''); setSuccess(false); }, [course]);
+
+      if (!course) return null;
+
+      const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+      };
+
+      const validateForm = () => {
+        if (!formData.prefix || !formData.fullName || !formData.type || !formData.email || !formData.campus || !formData.faculty || !formData.phone) {
+          return 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน';
+        }
+        if (formData.faculty === 'อื่นๆ โปรดระบุ' && !formData.facultyOther) return 'กรุณาระบุคณะ/หน่วยงาน';
+        
+        const emailDomain = formData.email.split('@')[1];
+        if (formData.type === 'บุคลากร' && emailDomain !== 'rmutl.ac.th') return 'บุคลากรต้องใช้อีเมล @rmutl.ac.th เท่านั้น';
+        if (formData.type === 'นักศึกษา' && emailDomain !== 'live.rmutl.ac.th') return 'นักศึกษาต้องใช้อีเมล @live.rmutl.ac.th เท่านั้น';
+        
+        if (!formData.pdpa) return 'กรุณายอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล (PDPA)';
+        return null;
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const validationError = validateForm();
+        if (validationError) { setError(validationError); return; }
+
+        const newReg = {
+          regId: 'r' + Date.now(),
+          courseId: course.courseId,
+          ...formData,
+          faculty: formData.faculty === 'อื่นๆ โปรดระบุ' ? formData.facultyOther : formData.faculty,
+          status: 'รอยืนยัน',
+          timestamp: new Date().toISOString()
+        };
+
+        setRegs([...regs, newReg]);
+        setSuccess(true);
+        setFormData(defaultForm);
+      };
+
+      if (success) {
+        return (
+          <div className="max-w-md mx-auto mt-10 text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+            <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle size={32}/></div>
+            <h2 className="text-2xl font-semibold mb-2 text-slate-800">ลงทะเบียนสำเร็จ</h2>
+            <p className="text-slate-500 mb-6">ระบบได้บันทึกข้อมูลการลงทะเบียนของคุณแล้ว กรุณาตรวจสอบสถานะในหน้า "ตรวจสอบรายชื่อ"</p>
+            <button onClick={onBack} className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">กลับหน้าหลัก</button>
+          </div>
+        );
+      }
+
+      const campuses = ['เชียงใหม่', 'เชียงราย', 'ลำปาง', 'ตาก', 'น่าน', 'พิษณุโลก'];
+      const faculties = ['คณะวิศวกรรมศาสตร์', 'คณะบริหารธุรกิจและศิลปศาสตร์', 'คณะศิลปกรรมและสถาปัตยกรรมศาสตร์', 'คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร', 'วิทยาลัยเทคโนโลยีและสหวิทยาการ', 'สำนักงานอธิการบดี', 'สำนักส่งเสริมวิชาการและงานทะเบียน', 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ', 'สถาบันถ่ายทอดเทคโนโลยีสู่ชุมชน', 'กองบริหารงานบุคคล', 'อื่นๆ โปรดระบุ'];
+
+      return (
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
+          <div className="mb-8 border-b border-slate-100 pb-6">
+            <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-4 flex items-center gap-1">← กลับ</button>
+            <h1 className="text-2xl font-semibold text-slate-800 mb-2">ฟอร์มลงทะเบียน</h1>
+            <div className="bg-indigo-50 p-4 rounded-xl">
+              <h2 className="font-medium text-indigo-900">{course.title}</h2>
+              <p className="text-sm text-indigo-700 mt-1 flex items-center gap-2"><Calendar size={14}/> {course.date}</p>
+            </div>
+          </div>
+
+          {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-2 text-sm"><AlertCircle size={18}/> {error}</div>}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">คำนำหน้า *</label>
+                <select name="prefix" value={formData.prefix} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">เลือก</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="นางสาว">นางสาว</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล *</label>
+                <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="เช่น สมชาย ใจดี" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">ประเภท *</label>
+                <select name="type" value={formData.type} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">เลือกประเภท</option>
+                  <option value="บุคลากร">บุคลากร</option>
+                  <option value="นักศึกษา">นักศึกษา</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">อีเมล *</label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder={formData.type === 'นักศึกษา' ? '@live.rmutl.ac.th' : '@rmutl.ac.th'} />
+                <p className="text-xs text-slate-400 mt-1">บุคลากร: @rmutl.ac.th / นักศึกษา: @live.rmutl.ac.th</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">เขตพื้นที่ *</label>
+                <select name="campus" value={formData.campus} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">เลือกเขตพื้นที่</option>
+                  {campuses.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ *</label>
+                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="08XXXXXXXX" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">คณะ/หน่วยงาน *</label>
+              <select name="faculty" value={formData.faculty} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="">เลือกคณะ/หน่วยงาน</option>
+                {faculties.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+
+            {formData.faculty === 'อื่นๆ โปรดระบุ' && (
+              <div>
+                <input type="text" name="facultyOther" value={formData.facultyOther} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="โปรดระบุหน่วยงานของคุณ" />
               </div>
             )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
-function AdminLogin({ onLogin, onBack }) {
-  const [user, setUser] = useState('');
-  const [pass, setPass] = useState('');
-  const [err, setErr] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (user === 'admin' && pass === 'admin') onLogin();
-    else setErr('Username หรือ Password ไม่ถูกต้อง');
-  };
-
-  return (
-    <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><LogIn className="text-slate-600" /></div>
-        <h2 className="text-2xl font-semibold text-slate-800">Admin Login</h2>
-        <p className="text-slate-500 text-sm mt-1">เข้าสู่ระบบสำหรับผู้ดูแลจัดการ</p>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {err && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl">{err}</div>}
-        <div>
-          <label className="block text-sm text-slate-600 mb-1">Username</label>
-          <input type="text" value={user} onChange={e=>setUser(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500" />
-        </div>
-        <div>
-          <label className="block text-sm text-slate-600 mb-1">Password</label>
-          <input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500" />
-        </div>
-        <button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl font-medium hover:bg-slate-900 transition-colors mt-2">เข้าสู่ระบบ</button>
-        <button type="button" onClick={onBack} className="w-full p-3 text-slate-500 hover:text-slate-800 text-sm">กลับหน้าหลัก</button>
-      </form>
-    </div>
-  );
-}
-
-function AdminDashboard({ courses, setCourses, regs, onManageRegs }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const emptyCourse = { 
-    courseId: '', title: '', speaker: '', date: '', location: '', targetGroup: '', 
-    content: '', objective: '', note: '', openDate: '', closeDate: '', maxAttendees: 50,
-    confirmOpenDate: '', confirmCloseDate: ''
-  };
-  const [editData, setEditData] = useState(emptyCourse);
-
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (editData.courseId) {
-      setCourses(courses.map(c => c.courseId === editData.courseId ? editData : c));
-    } else {
-      setCourses([...courses, { ...editData, courseId: 'c' + Date.now() }]);
-    }
-    setIsEditing(false);
-  };
-
-  const handleDelete = (id) => {
-    if(confirm('ต้องการลบหลักสูตรนี้ใช่หรือไม่? (ข้อมูลการลงทะเบียนที่เกี่ยวข้องจะถูกลบไปด้วย)')) {
-      setCourses(courses.filter(c => c.courseId !== id));
-    }
-  };
-
-  const handleChange = (e) => setEditData({...editData, [e.target.name]: e.target.value});
-
-  if (isEditing) {
-    return (
-      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 max-w-4xl mx-auto">
-        <h2 className="text-xl font-semibold mb-6 text-slate-800">{editData.courseId ? 'แก้ไขหลักสูตร' : 'เพิ่มหลักสูตรใหม่'}</h2>
-        <form onSubmit={handleSave} className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">ชื่อหลักสูตร</label><input required name="title" value={editData.title} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div><label className="block text-sm mb-1 text-slate-600">ชื่อวิทยากร</label><input required name="speaker" value={editData.speaker} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div><label className="block text-sm mb-1 text-slate-600">กลุ่มเป้าหมาย</label><input required name="targetGroup" value={editData.targetGroup} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div><label className="block text-sm mb-1 text-slate-600">วันที่จัดอบรม</label><input required type="date" name="date" value={editData.date} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div><label className="block text-sm mb-1 text-slate-600">สถานที่</label><input required name="location" value={editData.location} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-              <div className="md:col-span-2 pb-2 border-b border-slate-200"><span className="font-semibold text-slate-700">ช่วงเวลารับสมัคร</span></div>
-              <div><label className="block text-sm mb-1 text-slate-600">วันเปิดรับสมัคร</label><input required type="date" name="openDate" value={editData.openDate} onChange={handleChange} className="w-full p-2 border rounded-lg bg-white"/></div>
-              <div><label className="block text-sm mb-1 text-slate-600">วันปิดรับสมัคร</label><input required type="date" name="closeDate" value={editData.closeDate} onChange={handleChange} className="w-full p-2 border rounded-lg bg-white"/></div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label>
+              <input type="text" name="allergy" value={formData.allergy} onChange={handleChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="เช่น อาหารทะเล, ถั่ว (เว้นว่างหากไม่มี)" />
             </div>
 
-            <div className="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-              <div className="md:col-span-2 pb-2 border-b border-indigo-100"><span className="font-semibold text-indigo-800">ช่วงเวลายืนยันการเข้าร่วม (สำหรับผู้มีรายชื่อ)</span></div>
-              <div><label className="block text-sm mb-1 text-indigo-700">วันเริ่มยืนยันเข้าร่วม</label><input required type="date" name="confirmOpenDate" value={editData.confirmOpenDate} onChange={handleChange} className="w-full p-2 border border-indigo-200 rounded-lg bg-white"/></div>
-              <div><label className="block text-sm mb-1 text-indigo-700">วันสิ้นสุดยืนยันเข้าร่วม</label><input required type="date" name="confirmCloseDate" value={editData.confirmCloseDate} onChange={handleChange} className="w-full p-2 border border-indigo-200 rounded-lg bg-white"/></div>
+            <div className="bg-slate-50 p-4 rounded-xl mt-6 border border-slate-200">
+              <p className="text-sm font-medium text-slate-800 mb-2">การขอความยินยอม ใช้ข้อมูลส่วนบุคคล สำหรับการประชุม/อบรม/สัมมนา</p>
+              <p className="text-xs text-slate-500 mb-3 leading-relaxed">ข้อมูลที่ท่านกรอกจะถูกนำไปใช้เพื่อการบริหารจัดการโครงการ การติดต่อประสานงาน และการจัดทำรายงานสรุปผลการดำเนินงานเท่านั้น ตามพ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA)</p>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" name="pdpa" checked={formData.pdpa} onChange={handleChange} className="mt-1 w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" />
+                <span className="text-sm text-slate-700">ข้าพเจ้าได้อ่านและยอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล</span>
+              </label>
             </div>
 
-            <div><label className="block text-sm mb-1 text-slate-600 mt-2">จำนวนที่รับ (คน)</label><input required type="number" name="maxAttendees" value={editData.maxAttendees} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div><label className="block text-sm mb-1 text-slate-600 mt-2">หมายเหตุ</label><input name="note" value={editData.note} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
-            <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">เนื้อหาการอบรม</label><textarea required name="content" value={editData.content} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50 h-24"/></div>
-            <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">วัตถุประสงค์</label><textarea required name="objective" value={editData.objective} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50 h-20"/></div>
-          </div>
-          <div className="flex gap-4 pt-4 border-t">
-            <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-2 border rounded-xl text-slate-600 hover:bg-slate-50">ยกเลิก</button>
-            <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">บันทึกข้อมูล</button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-slate-800">จัดการหลักสูตร</h1>
-        <button onClick={() => { setEditData(emptyCourse); setIsEditing(true); }} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm"><Plus size={16}/> เพิ่มหลักสูตร</button>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-100">
-              <tr>
-                <th className="p-4 font-medium">ชื่อหลักสูตร</th>
-                <th className="p-4 font-medium">วันที่จัด</th>
-                <th className="p-4 font-medium">ยอดลงทะเบียน</th>
-                <th className="p-4 font-medium">สถานะ</th>
-                <th className="p-4 font-medium text-right">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {courses.map(c => {
-                const count = regs.filter(r => r.courseId === c.courseId && r.status !== 'ยกเลิก').length;
-                return (
-                  <tr key={c.courseId} className="hover:bg-slate-50/50">
-                    <td className="p-4 text-slate-800 font-medium max-w-xs truncate">{c.title}</td>
-                    <td className="p-4 text-slate-500">{c.date}</td>
-                    <td className="p-4 text-slate-500">{count} / {c.maxAttendees}</td>
-                    <td className="p-4 text-slate-500 text-xs">เปิด {c.openDate} - {c.closeDate}</td>
-                    <td className="p-4 flex gap-2 justify-end">
-                      <button onClick={() => onManageRegs(c)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg flex items-center gap-1" title="จัดการรายชื่อ"><Users size={16}/></button>
-                      <button onClick={() => { setEditData(c); setIsEditing(true); }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="แก้ไขหลักสูตร"><Edit size={16}/></button>
-                      <button onClick={() => handleDelete(c.courseId)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="ลบหลักสูตร"><Trash2 size={16}/></button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// === หน้าแอดมิน: จัดการรายชื่อของแต่ละหลักสูตร (เพิ่ม/แก้ไข/ลบ/Export) ===
-function AdminAttendeesView({ course, regs, setRegs, onBack }) {
-  const [editingReg, setEditingReg] = useState(null);
-  
-  const defaultForm = { 
-    prefix: 'นาย', fullName: '', type: 'บุคลากร', email: '', 
-    campus: '', faculty: '', phone: '', allergy: '', status: 'รอยืนยัน' 
-  };
-  const [form, setForm] = useState(defaultForm);
-
-  if (!course) return null;
-  const courseRegs = regs.filter(r => r.courseId === course.courseId);
-
-  const handleExportCSV = () => {
-    // กำหนดหัวคอลัมน์
-    const headers = ['ลำดับ', 'รหัสลงทะเบียน', 'คำนำหน้า', 'ชื่อ-นามสกุล', 'ประเภท', 'อีเมล', 'เขตพื้นที่', 'คณะ/หน่วยงาน', 'เบอร์โทรศัพท์', 'ประวัติแพ้อาหาร', 'สถานะ'];
-    
-    // แมปข้อมูลให้อยู่ในรูปแบบ Array ของแถว
-    const csvRows = courseRegs.map((r, index) => [
-      index + 1, r.regId, r.prefix, r.fullName, r.type, r.email, r.campus, r.faculty, r.phone, r.allergy || '-', r.status
-    ]);
-
-    // แปลงเป็น String CSV พร้อมใส่ Double Quote ครอบข้อความกันปัญหามีคอมม่าในข้อความ
-    let csvContent = headers.join(',') + '\n';
-    csvRows.forEach(row => {
-      csvContent += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
-    });
-
-    // เพิ่ม BOM (\uFEFF) นำหน้า เพื่อให้ Excel รองรับภาษาไทย UTF-8 100%
-    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `รายชื่อผู้ลงทะเบียน_${course.title}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const openForm = (reg = null) => {
-    if (reg) {
-      setForm(reg);
-    } else {
-      setForm(defaultForm);
-    }
-    setEditingReg(reg ? 'edit' : 'add');
-  };
-
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (editingReg === 'add') {
-      const newReg = { ...form, regId: 'r' + Date.now(), courseId: course.courseId, timestamp: new Date().toISOString() };
-      setRegs([...regs, newReg]);
-    } else {
-      setRegs(regs.map(r => r.regId === form.regId ? form : r));
-    }
-    setEditingReg(null);
-  };
-
-  const handleDelete = (id) => {
-    if (confirm('ยืนยันที่จะลบข้อมูลการลงทะเบียนนี้อย่างถาวรใช่หรือไม่?')) {
-      setRegs(regs.filter(r => r.regId !== id));
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'เข้าร่วม': return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">เข้าร่วม</span>;
-      case 'ยกเลิก': return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium">ยกเลิก</span>;
-      default: return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">รอยืนยัน</span>;
-    }
-  };
-
-  return (
-    <div className="space-y-6 animate-in fade-in">
-      <div className="flex items-center gap-4 mb-2">
-        <button onClick={onBack} className="p-2 bg-white text-slate-500 hover:text-indigo-600 rounded-xl shadow-sm border border-slate-100">← กลับ</button>
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-800">จัดการรายชื่อผู้ลงทะเบียน</h2>
-          <p className="text-indigo-600 text-sm mt-1">{course.title}</p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div className="text-sm text-slate-500">
-            จำนวนทั้งหมด: <span className="font-semibold text-slate-800">{courseRegs.length}</span> คน 
-            (เข้าร่วม {courseRegs.filter(r=>r.status === 'เข้าร่วม').length}, 
-            ยกเลิก {courseRegs.filter(r=>r.status === 'ยกเลิก').length})
-          </div>
-          <div className="flex gap-2 w-full md:w-auto">
-            <button onClick={handleExportCSV} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm transition-colors shadow-sm">
-              <FileSpreadsheet size={16}/> Export Excel
-            </button>
-            <button onClick={() => openForm(null)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm transition-colors shadow-sm">
-              <UserPlus size={16}/> เพิ่มรายชื่อ
-            </button>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>
-                <th className="p-4 font-medium">ลำดับ</th>
-                <th className="p-4 font-medium">ชื่อ-นามสกุล</th>
-                <th className="p-4 font-medium">ประเภท</th>
-                <th className="p-4 font-medium">คณะ/หน่วยงาน</th>
-                <th className="p-4 font-medium">เบอร์โทร</th>
-                <th className="p-4 font-medium">สถานะ</th>
-                <th className="p-4 font-medium text-right">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {courseRegs.length === 0 ? (
-                <tr><td colSpan="7" className="p-8 text-center text-slate-400">ยังไม่มีข้อมูลผู้ลงทะเบียน</td></tr>
-              ) : (
-                courseRegs.map((r, i) => (
-                  <tr key={r.regId} className="hover:bg-slate-50/50">
-                    <td className="p-4 text-slate-500">{i + 1}</td>
-                    <td className="p-4 font-medium text-slate-800">{r.prefix}{r.fullName}</td>
-                    <td className="p-4 text-slate-600">{r.type}</td>
-                    <td className="p-4 text-slate-600 max-w-[150px] truncate" title={r.faculty}>{r.faculty}</td>
-                    <td className="p-4 text-slate-600">{r.phone}</td>
-                    <td className="p-4">{getStatusBadge(r.status)}</td>
-                    <td className="p-4 flex gap-2 justify-end">
-                      <button onClick={() => openForm(r)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="แก้ไข"><Edit size={16}/></button>
-                      <button onClick={() => handleDelete(r.regId)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="ลบ"><Trash2 size={16}/></button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {editingReg && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-              <h3 className="text-xl font-semibold text-slate-800">{editingReg === 'add' ? 'เพิ่มรายชื่อใหม่' : 'แก้ไขข้อมูลรายชื่อ'}</h3>
-              <button onClick={() => setEditingReg(null)} className="text-slate-400 hover:bg-slate-100 p-1 rounded-full"><XCircle size={24}/></button>
+            <div className="flex gap-4 pt-4">
+              <button type="button" onClick={onBack} className="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors">ยกเลิก</button>
+              <button type="submit" className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors shadow-sm">ยืนยันการลงทะเบียน</button>
             </div>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">คำนำหน้า</label>
-                  <select value={form.prefix} onChange={e=>setForm({...form, prefix: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm">
-                    <option value="นาย">นาย</option>
-                    <option value="นาง">นาง</option>
-                    <option value="นางสาว">นางสาว</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-slate-600 mb-1">ชื่อ-นามสกุล</label>
-                  <input required type="text" value={form.fullName} onChange={e=>setForm({...form, fullName: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"/>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">ประเภท</label>
-                  <select value={form.type} onChange={e=>setForm({...form, type: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm">
-                    <option value="บุคลากร">บุคลากร</option>
-                    <option value="นักศึกษา">นักศึกษา</option>
-                    <option value="บุคคลภายนอก">บุคคลภายนอก</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">อีเมล</label>
-                  <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"/>
-                </div>
-              </div>
+          </form>
+        </div>
+      );
+    }
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">เขตพื้นที่</label>
-                  <input required type="text" value={form.campus} onChange={e=>setForm({...form, campus: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm" placeholder="เช่น เชียงใหม่"/>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">เบอร์โทรศัพท์</label>
-                  <input required type="text" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"/>
-                </div>
-              </div>
+    function AttendeesView({ course, regs, setRegs, onBack }) {
+      const [editingReg, setEditingReg] = useState(null);
+      const [authEmail, setAuthEmail] = useState('');
+      const [isAuthed, setIsAuthed] = useState(false);
+      const [authError, setAuthError] = useState('');
+      const [editForm, setEditForm] = useState({ fullName: '', phone: '', allergy: '' });
 
-              <div>
-                <label className="block text-sm text-slate-600 mb-1">คณะ/หน่วยงาน</label>
-                <input required type="text" value={form.faculty} onChange={e=>setForm({...form, faculty: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm" placeholder="พิมพ์ชื่อคณะหรือหน่วยงาน"/>
-              </div>
+      if (!course) return null;
+      const courseRegs = regs.filter(r => r.courseId === course.courseId);
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-slate-600 mb-1">ประวัติแพ้อาหาร</label>
-                  <input type="text" value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-sm" placeholder="ระบุหากมี"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-indigo-700 mb-1">สถานะการเข้าร่วม</label>
-                  <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full p-2 border border-indigo-200 rounded-lg bg-indigo-50 text-sm font-medium">
-                    <option value="รอยืนยัน">รอยืนยัน</option>
-                    <option value="เข้าร่วม">เข้าร่วม</option>
-                    <option value="ยกเลิก">ยกเลิก</option>
-                  </select>
-                </div>
-              </div>
+      const today = new Date().toISOString().split('T')[0];
+      const isConfirmPeriod = course.confirmOpenDate && course.confirmCloseDate && 
+                              today >= course.confirmOpenDate && today <= course.confirmCloseDate;
 
-              <div className="flex gap-4 pt-6 mt-2 border-t border-slate-100">
-                <button type="button" onClick={() => setEditingReg(null)} className="flex-1 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50">ยกเลิก</button>
-                <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm">บันทึกข้อมูล</button>
+      const getStatusBadge = (status) => {
+        switch(status) {
+          case 'เข้าร่วม': return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">เข้าร่วม</span>;
+          case 'ยกเลิก': return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium">ยกเลิก</span>;
+          default: return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">รอยืนยัน</span>;
+        }
+      };
+
+      const openEditModal = (reg) => {
+        setEditingReg(reg);
+        setAuthEmail('');
+        setIsAuthed(false);
+        setAuthError('');
+        setEditForm({ fullName: reg.fullName, phone: reg.phone, allergy: reg.allergy });
+      };
+
+      const handleVerify = (e) => {
+        e.preventDefault();
+        if (authEmail === editingReg.email) {
+          setIsAuthed(true);
+          setAuthError('');
+        } else {
+          setAuthError('อีเมลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+        }
+      };
+
+      const handleSaveInfo = () => {
+        setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, ...editForm } : r));
+        setEditingReg({ ...editingReg, ...editForm });
+        alert('อัปเดตข้อมูลส่วนตัวสำเร็จ');
+      };
+
+      const updateStatus = (newStatus) => {
+        setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, status: newStatus } : r));
+        setEditingReg({ ...editingReg, status: newStatus });
+      };
+
+      return (
+        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-2 flex items-center gap-1">← กลับ</button>
+              <h2 className="text-2xl font-semibold text-slate-800">รายชื่อผู้ลงทะเบียน</h2>
+              <p className="text-indigo-600 mt-1">{course.title}</p>
+            </div>
+            <div className="text-right bg-slate-50 p-3 rounded-xl">
+              <p className="text-sm text-slate-500 mb-1">จำนวนผู้ลงทะเบียน</p>
+              <p className="text-2xl font-bold text-slate-800">{courseRegs.filter(r => r.status !== 'ยกเลิก').length} / {course.maxAttendees}</p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  <th className="p-4 font-medium">ลำดับ</th>
+                  <th className="p-4 font-medium">ชื่อ-นามสกุล</th>
+                  <th className="p-4 font-medium">เขตพื้นที่</th>
+                  <th className="p-4 font-medium">คณะ/หน่วยงาน</th>
+                  <th className="p-4 font-medium">สถานะ</th>
+                  <th className="p-4 font-medium text-center">จัดการข้อมูลส่วนตัว</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {courseRegs.length === 0 ? (
+                  <tr><td colSpan="6" className="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>
+                ) : (
+                  courseRegs.map((r, i) => (
+                    <tr key={r.regId} className="hover:bg-slate-50/50">
+                      <td className="p-4 text-slate-500">{i + 1}</td>
+                      <td className="p-4 font-medium text-slate-800">{r.prefix}{r.fullName}</td>
+                      <td className="p-4 text-slate-600">{r.campus}</td>
+                      <td className="p-4 text-slate-600">{r.faculty}</td>
+                      <td className="p-4">{getStatusBadge(r.status)}</td>
+                      <td className="p-4 text-center">
+                        <button onClick={() => openEditModal(r)} className="p-2 text-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg">
+                          <Edit size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {editingReg && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-xl relative">
+                <button onClick={() => setEditingReg(null)} className="absolute top-4 right-4 text-slate-400 hover:bg-slate-100 rounded-full p-1"><XCircle size={24}/></button>
+                <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2"><Edit size={20} className="text-indigo-600"/> จัดการข้อมูลส่วนตัว</h3>
+
+                {!isAuthed ? (
+                  <form onSubmit={handleVerify} className="space-y-4">
+                    <div className="bg-indigo-50 p-4 rounded-xl mb-4">
+                      <p className="text-sm text-indigo-800">กรุณากรอกอีเมลที่ใช้ลงทะเบียนเพื่อยืนยันสิทธิ์ของ <b>{editingReg.prefix}{editingReg.fullName}</b></p>
+                    </div>
+                    <div>
+                      <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="อีเมลของคุณ" className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm" />
+                    </div>
+                    {authError && <p className="text-xs text-red-500">{authError}</p>}
+                    <button type="submit" className="w-full p-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition-colors mt-2">ยืนยันตัวตน</button>
+                  </form>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div><label className="text-xs text-slate-500 block mb-1">ชื่อ-นามสกุล</label><input type="text" value={editForm.fullName} onChange={e => setEditForm({...editForm, fullName: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                      <div><label className="text-xs text-slate-500 block mb-1">เบอร์โทรศัพท์</label><input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                      <div><label className="text-xs text-slate-500 block mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label><input type="text" value={editForm.allergy} onChange={e => setEditForm({...editForm, allergy: e.target.value})} className="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" /></div>
+                      <button onClick={handleSaveInfo} className="w-full p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl text-sm font-medium">บันทึกข้อมูลส่วนตัว</button>
+                    </div>
+                    <div className="space-y-3 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-end mb-2">
+                        <p className="text-sm font-medium text-slate-800">สถานะการเข้าร่วมกิจกรรม</p>
+                        <p className="text-xs text-slate-500 text-right">ช่วงยืนยัน:<br/>{course.confirmOpenDate || '-'} ถึง {course.confirmCloseDate || '-'}</p>
+                      </div>
+                      {editingReg.status === 'เข้าร่วม' ? (
+                        <div className="p-3 bg-green-50 text-green-700 text-sm rounded-xl flex items-center justify-center gap-2 border border-green-200 font-medium"><CheckCircle size={18}/> คุณได้ยืนยันการเข้าร่วมแล้ว</div>
+                      ) : isConfirmPeriod ? (
+                        <button onClick={() => updateStatus('เข้าร่วม')} className="w-full p-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium flex justify-center items-center gap-2 shadow-sm"><CheckCircle size={18}/> ยืนยันเข้าร่วมกิจกรรม</button>
+                      ) : (
+                        <button disabled className="w-full p-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium flex justify-center items-center gap-2 cursor-not-allowed"><Clock size={18}/> นอกช่วงเวลายืนยันเข้าร่วม</button>
+                      )}
+                      {editingReg.status !== 'ยกเลิก' && (
+                        <button onClick={() => updateStatus('ยกเลิก')} className="w-full p-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium flex justify-center items-center gap-2 mt-2"><XCircle size={18}/> ยกเลิกการลงทะเบียน</button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function AdminLogin({ onLogin, onBack }) {
+      const [user, setUser] = useState('');
+      const [pass, setPass] = useState('');
+      const [err, setErr] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (user === 'admin' && pass === 'admin') onLogin();
+        else setErr('Username หรือ Password ไม่ถูกต้อง');
+      };
+
+      return (
+        <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><LogIn className="text-slate-600" /></div>
+            <h2 className="text-2xl font-semibold text-slate-800">Admin Login</h2>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {err && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl">{err}</div>}
+            <div><label className="block text-sm text-slate-600 mb-1">Username</label><input type="text" value={user} onChange={e=>setUser(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none" /></div>
+            <div><label className="block text-sm text-slate-600 mb-1">Password</label><input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none" /></div>
+            <button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl font-medium mt-2">เข้าสู่ระบบ</button>
+            <button type="button" onClick={onBack} className="w-full p-3 text-slate-500 hover:text-slate-800 text-sm">กลับหน้าหลัก</button>
+          </form>
+        </div>
+      );
+    }
+
+    function AdminDashboard({ courses, setCourses, regs, onManageRegs }) {
+      const [isEditing, setIsEditing] = useState(false);
+      const emptyCourse = { 
+        courseId: '', title: '', speaker: '', date: '', location: '', targetGroup: '', 
+        content: '', objective: '', note: '', openDate: '', closeDate: '', maxAttendees: 50, confirmOpenDate: '', confirmCloseDate: ''
+      };
+      const [editData, setEditData] = useState(emptyCourse);
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        if (editData.courseId) setCourses(courses.map(c => c.courseId === editData.courseId ? editData : c));
+        else setCourses([...courses, { ...editData, courseId: 'c' + Date.now() }]);
+        setIsEditing(false);
+      };
+
+      const handleDelete = (id) => {
+        if(confirm('ต้องการลบหลักสูตรนี้ใช่หรือไม่?')) setCourses(courses.filter(c => c.courseId !== id));
+      };
+
+      const handleChange = (e) => setEditData({...editData, [e.target.name]: e.target.value});
+
+      if (isEditing) {
+        return (
+          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 max-w-4xl mx-auto">
+            <h2 className="text-xl font-semibold mb-6 text-slate-800">{editData.courseId ? 'แก้ไขหลักสูตร' : 'เพิ่มหลักสูตรใหม่'}</h2>
+            <form onSubmit={handleSave} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">ชื่อหลักสูตร</label><input required name="title" value={editData.title} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div><label className="block text-sm mb-1 text-slate-600">ชื่อวิทยากร</label><input required name="speaker" value={editData.speaker} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div><label className="block text-sm mb-1 text-slate-600">กลุ่มเป้าหมาย</label><input required name="targetGroup" value={editData.targetGroup} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div><label className="block text-sm mb-1 text-slate-600">วันที่จัดอบรม</label><input required type="date" name="date" value={editData.date} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div><label className="block text-sm mb-1 text-slate-600">สถานที่</label><input required name="location" value={editData.location} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                
+                <div className="p-4 bg-slate-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2 border-b"><span className="font-semibold">ช่วงเวลารับสมัคร</span></div>
+                  <div><label className="block text-sm mb-1 text-slate-600">วันเปิดรับสมัคร</label><input required type="date" name="openDate" value={editData.openDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div>
+                  <div><label className="block text-sm mb-1 text-slate-600">วันปิดรับสมัคร</label><input required type="date" name="closeDate" value={editData.closeDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div>
+                </div>
+
+                <div className="p-4 bg-indigo-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2 border-b border-indigo-200"><span className="font-semibold text-indigo-800">ช่วงเวลายืนยันการเข้าร่วม</span></div>
+                  <div><label className="block text-sm mb-1 text-indigo-700">เริ่มยืนยัน</label><input required type="date" name="confirmOpenDate" value={editData.confirmOpenDate} onChange={handleChange} className="w-full p-2 border border-indigo-200 rounded-lg"/></div>
+                  <div><label className="block text-sm mb-1 text-indigo-700">สิ้นสุดยืนยัน</label><input required type="date" name="confirmCloseDate" value={editData.confirmCloseDate} onChange={handleChange} className="w-full p-2 border border-indigo-200 rounded-lg"/></div>
+                </div>
+
+                <div><label className="block text-sm mb-1 text-slate-600">จำนวนรับ (คน)</label><input required type="number" name="maxAttendees" value={editData.maxAttendees} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div><label className="block text-sm mb-1 text-slate-600">หมายเหตุ</label><input name="note" value={editData.note} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50"/></div>
+                <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">เนื้อหาการอบรม</label><textarea required name="content" value={editData.content} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50 h-24"/></div>
+                <div className="md:col-span-2"><label className="block text-sm mb-1 text-slate-600">วัตถุประสงค์</label><textarea required name="objective" value={editData.objective} onChange={handleChange} className="w-full p-2 border rounded-lg bg-slate-50 h-20"/></div>
+              </div>
+              <div className="flex gap-4 pt-4 border-t">
+                <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-2 border rounded-xl text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">บันทึกข้อมูล</button>
               </div>
             </form>
           </div>
+        );
+      }
+
+      return (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-semibold text-slate-800">จัดการหลักสูตร</h1>
+            <button onClick={() => { setEditData(emptyCourse); setIsEditing(true); }} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm"><Plus size={16}/> เพิ่มหลักสูตร</button>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                <tr><th className="p-4">ชื่อหลักสูตร</th><th className="p-4">วันที่จัด</th><th className="p-4">ยอดลงทะเบียน</th><th className="p-4 text-right">จัดการ</th></tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {courses.map(c => {
+                  const count = regs.filter(r => r.courseId === c.courseId && r.status !== 'ยกเลิก').length;
+                  return (
+                    <tr key={c.courseId} className="hover:bg-slate-50">
+                      <td className="p-4 text-slate-800 font-medium max-w-xs truncate">{c.title}</td>
+                      <td className="p-4 text-slate-500">{c.date}</td>
+                      <td className="p-4 text-slate-500">{count} / {c.maxAttendees}</td>
+                      <td className="p-4 flex gap-2 justify-end">
+                        <button onClick={() => onManageRegs(c)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"><Users size={16}/></button>
+                        <button onClick={() => { setEditData(c); setIsEditing(true); }} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"><Edit size={16}/></button>
+                        <button onClick={() => handleDelete(c.courseId)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16}/></button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      )}
-    </div>
-  );
-}
+      );
+    }
+
+    function AdminAttendeesView({ course, regs, setRegs, onBack }) {
+      const [editingReg, setEditingReg] = useState(null);
+      const defaultForm = { prefix: 'นาย', fullName: '', type: 'บุคลากร', email: '', campus: '', faculty: '', phone: '', allergy: '', status: 'รอยืนยัน' };
+      const [form, setForm] = useState(defaultForm);
+
+      if (!course) return null;
+      const courseRegs = regs.filter(r => r.courseId === course.courseId);
+
+      const handleExportCSV = () => {
+        const headers = ['ลำดับ', 'รหัสลงทะเบียน', 'คำนำหน้า', 'ชื่อ-นามสกุล', 'ประเภท', 'อีเมล', 'เขตพื้นที่', 'คณะ/หน่วยงาน', 'เบอร์โทรศัพท์', 'ประวัติแพ้อาหาร', 'สถานะ'];
+        const csvRows = courseRegs.map((r, i) => [i + 1, r.regId, r.prefix, r.fullName, r.type, r.email, r.campus, r.faculty, r.phone, r.allergy || '-', r.status]);
+        let csvContent = headers.join(',') + '\n';
+        csvRows.forEach(row => { csvContent += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n'; });
+        
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `รายชื่อผู้ลงทะเบียน_${course.title}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      const openForm = (reg = null) => { setForm(reg || defaultForm); setEditingReg(reg ? 'edit' : 'add'); };
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        if (editingReg === 'add') setRegs([...regs, { ...form, regId: 'r' + Date.now(), courseId: course.courseId }]);
+        else setRegs(regs.map(r => r.regId === form.regId ? form : r));
+        setEditingReg(null);
+      };
+
+      const handleDelete = (id) => { if (confirm('ลบข้อมูลนี้ใช่หรือไม่?')) setRegs(regs.filter(r => r.regId !== id)); };
+
+      const getStatusBadge = (status) => {
+        if(status === 'เข้าร่วม') return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">เข้าร่วม</span>;
+        if(status === 'ยกเลิก') return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium">ยกเลิก</span>;
+        return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">รอยืนยัน</span>;
+      };
+
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center gap-4 mb-2">
+            <button onClick={onBack} className="p-2 bg-white text-slate-500 hover:text-indigo-600 rounded-xl shadow-sm border border-slate-100">← กลับ</button>
+            <div><h2 className="text-2xl font-semibold text-slate-800">จัดการรายชื่อผู้ลงทะเบียน</h2><p className="text-indigo-600 text-sm mt-1">{course.title}</p></div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div className="text-sm text-slate-500">จำนวนทั้งหมด: <span className="font-semibold">{courseRegs.length}</span> คน</div>
+              <div className="flex gap-2 w-full md:w-auto">
+                <button onClick={handleExportCSV} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 text-sm"><FileSpreadsheet size={16}/> Export Excel</button>
+                <button onClick={() => openForm(null)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm"><UserPlus size={16}/> เพิ่มรายชื่อ</button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr><th className="p-4">ลำดับ</th><th className="p-4">ชื่อ-นามสกุล</th><th className="p-4">ประเภท</th><th className="p-4">เบอร์โทร</th><th className="p-4">สถานะ</th><th className="p-4 text-right">จัดการ</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {courseRegs.map((r, i) => (
+                    <tr key={r.regId} className="hover:bg-slate-50">
+                      <td className="p-4 text-slate-500">{i + 1}</td><td className="p-4 font-medium">{r.prefix}{r.fullName}</td><td className="p-4 text-slate-600">{r.type}</td>
+                      <td className="p-4 text-slate-600">{r.phone}</td><td className="p-4">{getStatusBadge(r.status)}</td>
+                      <td className="p-4 flex gap-2 justify-end">
+                        <button onClick={() => openForm(r)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"><Edit size={16}/></button>
+                        <button onClick={() => handleDelete(r.regId)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16}/></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {editingReg && (
+            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6 pb-4 border-b">
+                  <h3 className="text-xl font-semibold">{editingReg === 'add' ? 'เพิ่มรายชื่อใหม่' : 'แก้ไขข้อมูล'}</h3>
+                  <button onClick={() => setEditingReg(null)} className="text-slate-400 hover:bg-slate-100 p-1 rounded-full"><XCircle size={24}/></button>
+                </div>
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label className="block text-sm mb-1">คำนำหน้า</label><select value={form.prefix} onChange={e=>setForm({...form, prefix: e.target.value})} className="w-full p-2 border rounded-lg"><option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option></select></div>
+                    <div className="md:col-span-2"><label className="block text-sm mb-1">ชื่อ-นามสกุล</label><input required value={form.fullName} onChange={e=>setForm({...form, fullName: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label className="block text-sm mb-1">ประเภท</label><select value={form.type} onChange={e=>setForm({...form, type: e.target.value})} className="w-full p-2 border rounded-lg"><option value="บุคลากร">บุคลากร</option><option value="นักศึกษา">นักศึกษา</option><option value="บุคคลภายนอก">บุคคลภายนอก</option></select></div>
+                    <div><label className="block text-sm mb-1">อีเมล</label><input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                    <div><label className="block text-sm mb-1">เขตพื้นที่</label><input required value={form.campus} onChange={e=>setForm({...form, campus: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                    <div><label className="block text-sm mb-1">เบอร์โทรศัพท์</label><input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                  </div>
+                  <div><label className="block text-sm mb-1">คณะ/หน่วยงาน</label><input required value={form.faculty} onChange={e=>setForm({...form, faculty: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label className="block text-sm mb-1">ประวัติแพ้อาหาร</label><input value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})} className="w-full p-2 border rounded-lg"/></div>
+                    <div>
+                      <label className="block text-sm font-semibold text-indigo-700 mb-1">สถานะการเข้าร่วม</label>
+                      <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full p-2 border border-indigo-200 rounded-lg bg-indigo-50">
+                        <option value="รอยืนยัน">รอยืนยัน</option><option value="เข้าร่วม">เข้าร่วม</option><option value="ยกเลิก">ยกเลิก</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 pt-4 border-t"><button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl">บันทึกข้อมูล</button></div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // --- RENDER APP ---
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
