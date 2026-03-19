@@ -9,15 +9,11 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
-
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
     body { font-family: 'Kanit', sans-serif; }
+    /* ซ่อน Scrollbar สำหรับความสวยงาม (ถ้าต้องการ) */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -27,17 +23,14 @@
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
-    
-    // --- เปลี่ยนจากการใช้ import เป็นการดึงจาก Global Variable ที่ CDN โหลดมาให้ ---
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxrQkc_wZ87j_LMVKUdGJtasdQoLtWXSkxqwbv2gkPwcSyYhsnraLgEI8LpcfRXEIJe/exec"; // วาง URL ของคุณที่นี่
-
-    const { useState, useEffect } = React;
-    const { createRoot } = ReactDOM;
-    const { 
+  <script type="text/babel" data-type="module">
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyyjF1tQ9yk_8GWsd6EIykH0mVlkDlw3OJwvycz7Bth2AjxqV6Alw2xlGFv0cwIogbN/exec";
+    import React, { useState, useEffect } from 'https://esm.sh/react@18';
+    import { createRoot } from 'https://esm.sh/react-dom@18/client';
+    import { 
       Calendar, MapPin, Users, BookOpen, User, CheckCircle, 
       XCircle, Clock, Search, LogIn, LogOut, Plus, Trash2, Edit, AlertCircle, Download, UserPlus, FileSpreadsheet, Phone, Mail, Globe
-    } = window.lucideReact;
+    } from 'https://esm.sh/lucide-react';
 
     // --- MOCK DATA (จำลอง Database) ---
     const initialCourses = [
