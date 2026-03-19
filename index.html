@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RMUTL Training Registration</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
   <style>
     body { font-family: 'Kanit', sans-serif; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -20,30 +23,75 @@
 </head>
 <body>
   <div id="root"></div>
+
   <script type="text/babel">
     const { useState, useEffect } = React;
     const { createRoot } = ReactDOM;
-    const { Calendar, MapPin, Users, BookOpen, User, CheckCircle, XCircle, Clock, Search, LogIn, LogOut, Plus, Trash2, Edit, AlertCircle, Download, UserPlus, FileSpreadsheet, Phone, Mail, Globe } = window.lucideReact;
+    const { 
+      Calendar, MapPin, Users, BookOpen, User, CheckCircle, XCircle, 
+      Clock, Search, LogIn, LogOut, Plus, Trash2, Edit, AlertCircle, 
+      Download, UserPlus, FileSpreadsheet, Phone, Mail, Globe 
+    } = window.lucideReact;
 
+    // --- ข้อมูลจำลอง ---
     const initialCourses = [
-      { courseId: 'c1', title: 'การพัฒนา Web Application ด้วย React ขั้นพื้นฐาน', speaker: 'อ.สมชาย ใจดี', date: '2026-04-10', location: 'ห้องปฏิบัติการคอมพิวเตอร์ 1', targetGroup: 'นักศึกษาและบุคลากร', content: 'เรียนรู้พื้นฐาน React, State, Props, Hooks', objective: 'เพื่อสร้างหน้าเว็บแบบ SPA ได้', note: 'เตรียม Notebook มาด้วย', openDate: '2026-03-01', closeDate: '2026-04-05', maxAttendees: 30, confirmOpenDate: '2026-04-06', confirmCloseDate: '2026-04-09' },
-      { courseId: 'c2', title: 'การใช้ AI เพื่อการศึกษา', speaker: 'ดร.สมศรี เรียนเก่ง', date: '2026-04-15', location: 'ห้องประชุมใหญ่ อาคาร A', targetGroup: 'บุคลากร', content: 'Prompt Engineering, การใช้ Gemini เบื้องต้น', objective: 'ประยุกต์ใช้ AI ในการทำงาน', note: '-', openDate: '2026-03-01', closeDate: '2026-03-10', maxAttendees: 2, confirmOpenDate: '2026-03-11', confirmCloseDate: '2026-04-14' }
+      { 
+        courseId: 'c1', title: 'การพัฒนา Web Application ด้วย React ขั้นพื้นฐาน', speaker: 'อ.สมชาย ใจดี', 
+        date: '2026-04-10', location: 'ห้องปฏิบัติการคอมพิวเตอร์ 1', targetGroup: 'นักศึกษาและบุคลากร', 
+        content: 'เรียนรู้พื้นฐาน React, State, Props, Hooks', objective: 'เพื่อสร้างหน้าเว็บแบบ SPA ได้', 
+        note: 'เตรียม Notebook มาด้วย', openDate: '2026-03-01', closeDate: '2026-04-05', 
+        maxAttendees: 30, confirmOpenDate: '2026-04-06', confirmCloseDate: '2026-04-09' 
+      },
+      { 
+        courseId: 'c2', title: 'การใช้ AI เพื่อการศึกษา', speaker: 'ดร.สมศรี เรียนเก่ง', 
+        date: '2026-04-15', location: 'ห้องประชุมใหญ่ อาคาร A', targetGroup: 'บุคลากร', 
+        content: 'Prompt Engineering, การใช้ Gemini เบื้องต้น', objective: 'ประยุกต์ใช้ AI ในการทำงาน', 
+        note: '-', openDate: '2026-03-01', closeDate: '2026-03-10', maxAttendees: 2, 
+        confirmOpenDate: '2026-03-11', confirmCloseDate: '2026-04-14' 
+      }
     ];
 
     const initialRegs = [
-      { regId: 'r1', courseId: 'c2', prefix: 'นาย', fullName: 'ทดสอบ ระบบ', type: 'บุคลากร', email: 'test@rmutl.ac.th', campus: 'เชียงใหม่', faculty: 'คณะวิศวกรรมศาสตร์', phone: '0812345678', allergy: '-', status: 'รอยืนยัน' }
+      { 
+        regId: 'r1', courseId: 'c2', prefix: 'นาย', fullName: 'ทดสอบ ระบบ', type: 'บุคลากร', 
+        email: 'test@rmutl.ac.th', campus: 'เชียงใหม่', faculty: 'คณะวิศวกรรมศาสตร์', 
+        phone: '0812345678', allergy: '-', status: 'รอยืนยัน' 
+      }
     ];
 
+    // --- Components ---
     function Footer() {
       return (
         <footer className="bg-slate-900 text-slate-300 py-10 mt-auto border-t border-slate-800 w-full">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div><h3 className="text-white text-lg font-medium mb-4">สำนักวิทยบริการและเทคโนโลยีสารสนเทศ</h3><p className="text-sm leading-relaxed text-slate-400">มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา<br />128 ถ.ห้วยแก้ว ต.ช้างเผือก อ.เมือง<br />จ.เชียงใหม่ 50300</p></div>
-            <div><h3 className="text-white text-lg font-medium mb-4">ติดต่อเรา</h3><ul className="space-y-3 text-sm text-slate-400"><li className="flex items-center gap-3"><Phone size={16} className="text-slate-500" /> 0 5392 1444 ต่อ 1622</li><li className="flex items-center gap-3"><Mail size={16} className="text-slate-500" /> arit@rmutl.ac.th</li><li className="flex items-center gap-3"><Globe size={16} className="text-slate-500" /> https://arit.rmutl.ac.th</li></ul></div>
-            <div><h3 className="text-white text-lg font-medium mb-4">เกี่ยวกับระบบ</h3><p className="text-sm leading-relaxed text-slate-400">ระบบลงทะเบียนอบรม / สัมมนาออนไลน์<br />ให้บริการสำหรับบุคลากรและนักศึกษา<br />มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา</p></div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">สำนักวิทยบริการและเทคโนโลยีสารสนเทศ</h3>
+              <p className="text-sm leading-relaxed text-slate-400">
+                มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา<br />
+                128 ถ.ห้วยแก้ว ต.ช้างเผือก อ.เมือง<br />
+                จ.เชียงใหม่ 50300
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">ติดต่อเรา</h3>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li className="flex items-center gap-3"><Phone size={16} className="text-slate-500" /> 0 5392 1444 ต่อ 1622</li>
+                <li className="flex items-center gap-3"><Mail size={16} className="text-slate-500" /> arit@rmutl.ac.th</li>
+                <li className="flex items-center gap-3"><Globe size={16} className="text-slate-500" /> https://arit.rmutl.ac.th</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white text-lg font-medium mb-4">เกี่ยวกับระบบ</h3>
+              <p className="text-sm leading-relaxed text-slate-400">
+                ระบบลงทะเบียนอบรม / สัมมนาออนไลน์<br />
+                ให้บริการสำหรับบุคลากรและนักศึกษา<br />
+                มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา
+              </p>
+            </div>
           </div>
           <div className="max-w-6xl mx-auto px-4 mt-8 pt-8 border-t border-slate-800 text-sm text-center text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
-            <span>© {new Date().getFullYear()} RMUTL Training Registration System. All rights reserved.</span><span className="text-xs">พัฒนาโดย ARIT RMUTL</span>
+            <span>© {new Date().getFullYear()} RMUTL Training Registration System. All rights reserved.</span>
+            <span className="text-xs">พัฒนาโดย ARIT RMUTL</span>
           </div>
         </footer>
       );
@@ -76,18 +124,46 @@
         <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
           <nav className="bg-white shadow-sm sticky top-0 z-50">
             <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('dashboard')}><BookOpen className="text-indigo-600" /><span className="font-semibold text-xl tracking-tight text-indigo-900">RMUTL <span className="text-slate-500 font-normal">Training</span></span></div>
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('dashboard')}>
+                <BookOpen className="text-indigo-600" />
+                <span className="font-semibold text-xl tracking-tight text-indigo-900">
+                  RMUTL <span className="text-slate-500 font-normal">Training</span>
+                </span>
+              </div>
               <div className="flex gap-4">
-                <button onClick={() => navigate('dashboard')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'dashboard' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>หน้าหลัก</button>
+                <button 
+                  onClick={() => navigate('dashboard')} 
+                  className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'dashboard' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}
+                >
+                  หน้าหลัก
+                </button>
                 {isAdminAuth ? (
                   <>
-                    <button onClick={() => navigate('admin')} className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'admin' || currentView === 'adminAttendees' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}>จัดการระบบ</button>
-                    <button onClick={() => { setIsAdminAuth(false); navigate('dashboard'); }} className="flex items-center gap-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"><LogOut size={18}/> ออกจากระบบ</button>
+                    <button 
+                      onClick={() => navigate('admin')} 
+                      className={`px-3 py-2 rounded-lg transition-colors ${currentView === 'admin' || currentView === 'adminAttendees' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'}`}
+                    >
+                      จัดการระบบ
+                    </button>
+                    <button 
+                      onClick={() => { setIsAdminAuth(false); navigate('dashboard'); }} 
+                      className="flex items-center gap-1 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    >
+                      <LogOut size={18}/> ออกจากระบบ
+                    </button>
                   </>
-                ) : <button onClick={() => navigate('adminLogin')} className="flex items-center gap-1 px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"><LogIn size={18}/> Admin</button>}
+                ) : (
+                  <button 
+                    onClick={() => navigate('adminLogin')} 
+                    className="flex items-center gap-1 px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                  >
+                    <LogIn size={18}/> Admin
+                  </button>
+                )}
               </div>
             </div>
           </nav>
+
           <main className="flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
             {currentView === 'dashboard' && <DashboardView courses={courses} getStatus={getCourseStatus} onRegister={(c) => navigate('register', c)} onCheckList={(c) => navigate('attendees', c)} />}
             {currentView === 'register' && <RegisterView course={selectedCourse} regs={registrations} setRegs={setRegistrations} onBack={() => navigate('dashboard')} />}
@@ -105,35 +181,80 @@
       const [selectedDetails, setSelectedDetails] = useState(null);
       return (
         <div className="space-y-6">
-          <div className="text-center mb-10"><h1 className="text-3xl font-semibold text-slate-800 mb-2">ระบบลงทะเบียนอบรม / สัมมนา</h1><p className="text-slate-500">เลือกหลักสูตรที่เปิดรับสมัครด้านล่างเพื่อทำการลงทะเบียน</p></div>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-semibold text-slate-800 mb-2">ระบบลงทะเบียนอบรม / สัมมนา</h1>
+            <p className="text-slate-500">เลือกหลักสูตรที่เปิดรับสมัครด้านล่างเพื่อทำการลงทะเบียน</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map(course => {
               const status = getStatus(course);
               return (
                 <div key={course.courseId} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col h-full">
-                  <div className="flex justify-between items-start mb-4"><span className={`px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span><span className="text-xs text-slate-400 flex items-center gap-1"><Users size={14}/> รับ {course.maxAttendees} คน</span></div>
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>{status.label}</span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1"><Users size={14}/> รับ {course.maxAttendees} คน</span>
+                  </div>
                   <h3 className="text-lg font-semibold mb-2 line-clamp-2">{course.title}</h3>
-                  <div className="space-y-2 text-sm text-slate-600 mb-6 flex-grow"><p className="flex items-center gap-2"><Calendar size={16} className="text-slate-400"/> {new Date(course.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p><p className="flex items-center gap-2"><MapPin size={16} className="text-slate-400"/> {course.location}</p><p className="flex items-center gap-2"><User size={16} className="text-slate-400"/> วิทยากร: {course.speaker}</p></div>
+                  <div className="space-y-2 text-sm text-slate-600 mb-6 flex-grow">
+                    <p className="flex items-center gap-2"><Calendar size={16} className="text-slate-400"/> {new Date(course.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p className="flex items-center gap-2"><MapPin size={16} className="text-slate-400"/> {course.location}</p>
+                    <p className="flex items-center gap-2"><User size={16} className="text-slate-400"/> วิทยากร: {course.speaker}</p>
+                  </div>
                   <div className="flex flex-col gap-2 mt-auto">
-                    <div className="grid grid-cols-2 gap-2"><button onClick={() => setSelectedDetails(course)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium">รายละเอียด</button><button onClick={() => onCheckList(course)} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-medium">ตรวจสอบรายชื่อ</button></div>
-                    {status.code === 'OPEN' ? <button onClick={() => onRegister(course)} className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium shadow-sm">ลงทะเบียน</button> : <button disabled className="w-full px-4 py-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">ไม่สามารถลงทะเบียนได้</button>}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button onClick={() => setSelectedDetails(course)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium">รายละเอียด</button>
+                      <button onClick={() => onCheckList(course)} className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-medium">ตรวจสอบรายชื่อ</button>
+                    </div>
+                    {status.code === 'OPEN' ? (
+                      <button onClick={() => onRegister(course)} className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium shadow-sm">ลงทะเบียน</button>
+                    ) : (
+                      <button disabled className="w-full px-4 py-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-medium cursor-not-allowed">ไม่สามารถลงทะเบียนได้</button>
+                    )}
                   </div>
                 </div>
               );
             })}
           </div>
+
           {selectedDetails && (
             <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-xl max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-start mb-6"><h2 className="text-2xl font-semibold text-slate-800">{selectedDetails.title}</h2><button onClick={() => setSelectedDetails(null)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500"><XCircle size={24}/></button></div>
+                <div className="flex justify-between items-start mb-6">
+                  <h2 className="text-2xl font-semibold text-slate-800">{selectedDetails.title}</h2>
+                  <button onClick={() => setSelectedDetails(null)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500"><XCircle size={24}/></button>
+                </div>
                 <div className="space-y-4 text-slate-600">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl"><div><span className="font-medium text-slate-800">วิทยากร:</span> {selectedDetails.speaker}</div><div><span className="font-medium text-slate-800">วันที่:</span> {selectedDetails.date}</div><div><span className="font-medium text-slate-800">สถานที่:</span> {selectedDetails.location}</div><div><span className="font-medium text-slate-800">กลุ่มเป้าหมาย:</span> {selectedDetails.targetGroup}</div><div><span className="font-medium text-slate-800">เปิดรับสมัคร:</span> {selectedDetails.openDate} ถึง {selectedDetails.closeDate}</div></div>
-                  <div><span className="font-medium text-slate-800 block mb-1">เนื้อหาการอบรม:</span><p className="bg-slate-50 p-3 rounded-lg whitespace-pre-wrap">{selectedDetails.content}</p></div>
-                  <div><span className="font-medium text-slate-800 block mb-1">วัตถุประสงค์:</span><p className="bg-slate-50 p-3 rounded-lg">{selectedDetails.objective}</p></div>
-                  <div><span className="font-medium text-slate-800 block mb-1">หมายเหตุ:</span><p className="bg-slate-50 p-3 rounded-lg text-orange-600">{selectedDetails.note || '-'}</p></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl">
+                    <div><span className="font-medium text-slate-800">วิทยากร:</span> {selectedDetails.speaker}</div>
+                    <div><span className="font-medium text-slate-800">วันที่:</span> {selectedDetails.date}</div>
+                    <div><span className="font-medium text-slate-800">สถานที่:</span> {selectedDetails.location}</div>
+                    <div><span className="font-medium text-slate-800">กลุ่มเป้าหมาย:</span> {selectedDetails.targetGroup}</div>
+                    <div><span className="font-medium text-slate-800">เปิดรับสมัคร:</span> {selectedDetails.openDate} ถึง {selectedDetails.closeDate}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-800 block mb-1">เนื้อหาการอบรม:</span>
+                    <p className="bg-slate-50 p-3 rounded-lg whitespace-pre-wrap">{selectedDetails.content}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-800 block mb-1">วัตถุประสงค์:</span>
+                    <p className="bg-slate-50 p-3 rounded-lg">{selectedDetails.objective}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-800 block mb-1">หมายเหตุ:</span>
+                    <p className="bg-slate-50 p-3 rounded-lg text-orange-600">{selectedDetails.note || '-'}</p>
+                  </div>
                   <div className="pt-4 border-t border-slate-100 flex gap-3">
-                    <button className="flex items-center justify-center gap-2 flex-1 px-4 py-3 bg-white border border-indigo-200 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors"><Download size={18}/> ดาวน์โหลดเอกสาร</button>
-                    {getStatus(selectedDetails).code === 'OPEN' && <button onClick={() => { onRegister(selectedDetails); setSelectedDetails(null); }} className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors shadow-sm">ไปหน้าลงทะเบียน</button>}
+                    <button className="flex items-center justify-center gap-2 flex-1 px-4 py-3 bg-white border border-indigo-200 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors">
+                      <Download size={18}/> ดาวน์โหลดเอกสาร
+                    </button>
+                    {getStatus(selectedDetails).code === 'OPEN' && (
+                      <button 
+                        onClick={() => { onRegister(selectedDetails); setSelectedDetails(null); }} 
+                        className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors shadow-sm"
+                      >
+                        ไปหน้าลงทะเบียน
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -149,10 +270,18 @@
       const [error, setError] = useState('');
       const [success, setSuccess] = useState(false);
 
-      useEffect(() => { setFormData(defaultForm); setError(''); setSuccess(false); }, [course]);
+      useEffect(() => { 
+        setFormData(defaultForm); 
+        setError(''); 
+        setSuccess(false); 
+      }, [course]);
+
       if (!course) return null;
 
-      const handleChange = (e) => { const { name, value, type, checked } = e.target; setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value })); };
+      const handleChange = (e) => { 
+        const { name, value, type, checked } = e.target; 
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value })); 
+      };
 
       const validateForm = () => {
         if (!formData.prefix || !formData.fullName || !formData.type || !formData.email || !formData.campus || !formData.faculty || !formData.phone) return 'กรุณากรอกข้อมูลให้ครบถ้วน';
@@ -167,44 +296,123 @@
       const handleSubmit = (e) => {
         e.preventDefault();
         const validationError = validateForm();
-        if (validationError) { setError(validationError); return; }
-        const newReg = { regId: 'r' + Date.now(), courseId: course.courseId, ...formData, faculty: formData.faculty === 'อื่นๆ โปรดระบุ' ? formData.facultyOther : formData.faculty, status: 'รอยืนยัน', timestamp: new Date().toISOString() };
-        setRegs([...regs, newReg]); setSuccess(true); setFormData(defaultForm);
+        if (validationError) { 
+          setError(validationError); 
+          return; 
+        }
+        const newReg = { 
+          regId: 'r' + Date.now(), 
+          courseId: course.courseId, 
+          ...formData, 
+          faculty: formData.faculty === 'อื่นๆ โปรดระบุ' ? formData.facultyOther : formData.faculty, 
+          status: 'รอยืนยัน', 
+          timestamp: new Date().toISOString() 
+        };
+        setRegs([...regs, newReg]); 
+        setSuccess(true); 
+        setFormData(defaultForm);
       };
 
       if (success) return (
         <div className="max-w-md mx-auto mt-10 text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
           <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle size={32}/></div>
-          <h2 className="text-2xl font-semibold mb-2 text-slate-800">ลงทะเบียนสำเร็จ</h2><p className="text-slate-500 mb-6">กรุณาตรวจสอบสถานะในหน้า "ตรวจสอบรายชื่อ"</p>
+          <h2 className="text-2xl font-semibold mb-2 text-slate-800">ลงทะเบียนสำเร็จ</h2>
+          <p className="text-slate-500 mb-6">กรุณาตรวจสอบสถานะในหน้า "ตรวจสอบรายชื่อ"</p>
           <button onClick={onBack} className="px-6 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">กลับหน้าหลัก</button>
         </div>
       );
 
       const campuses = ['เชียงใหม่', 'เชียงราย', 'ลำปาง', 'ตาก', 'น่าน', 'พิษณุโลก'];
-      const faculties = ['คณะวิศวกรรมศาสตร์', 'คณะบริหารธุรกิจและศิลปศาสตร์', 'คณะศิลปกรรมและสถาปัตยกรรมศาสตร์', 'คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร', 'วิทยาลัยเทคโนโลยีและสหวิทยาการ', 'สำนักงานอธิการบดี', 'สำนักส่งเสริมวิชาการและงานทะเบียน', 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ', 'สถาบันถ่ายทอดเทคโนโลยีสู่ชุมชน', 'กองบริหารงานบุคคล', 'อื่นๆ โปรดระบุ'];
+      const faculties = [
+        'คณะวิศวกรรมศาสตร์', 'คณะบริหารธุรกิจและศิลปศาสตร์', 'คณะศิลปกรรมและสถาปัตยกรรมศาสตร์', 
+        'คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร', 'วิทยาลัยเทคโนโลยีและสหวิทยาการ', 'สำนักงานอธิการบดี', 
+        'สำนักส่งเสริมวิชาการและงานทะเบียน', 'สำนักวิทยบริการและเทคโนโลยีสารสนเทศ', 
+        'สถาบันถ่ายทอดเทคโนโลยีสู่ชุมชน', 'กองบริหารงานบุคคล', 'อื่นๆ โปรดระบุ'
+      ];
 
       return (
         <div className="max-w-2xl mx-auto bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
-          <div className="mb-8 border-b border-slate-100 pb-6"><button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-4 flex items-center gap-1">← กลับ</button><h1 className="text-2xl font-semibold text-slate-800 mb-2">ฟอร์มลงทะเบียน</h1><div className="bg-indigo-50 p-4 rounded-xl"><h2 className="font-medium text-indigo-900">{course.title}</h2><p className="text-sm text-indigo-700 mt-1 flex items-center gap-2"><Calendar size={14}/> {course.date}</p></div></div>
+          <div className="mb-8 border-b border-slate-100 pb-6">
+            <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-4 flex items-center gap-1">← กลับ</button>
+            <h1 className="text-2xl font-semibold text-slate-800 mb-2">ฟอร์มลงทะเบียน</h1>
+            <div className="bg-indigo-50 p-4 rounded-xl">
+              <h2 className="font-medium text-indigo-900">{course.title}</h2>
+              <p className="text-sm text-indigo-700 mt-1 flex items-center gap-2"><Calendar size={14}/> {course.date}</p>
+            </div>
+          </div>
+          
           {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl flex items-center gap-2 text-sm"><AlertCircle size={18}/> {error}</div>}
+          
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div><label className="block text-sm mb-1">คำนำหน้า *</label><select name="prefix" value={formData.prefix} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"><option value="">เลือก</option><option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option></select></div>
-              <div className="md:col-span-2"><label className="block text-sm mb-1">ชื่อ-นามสกุล *</label><input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" /></div>
+              <div>
+                <label className="block text-sm mb-1">คำนำหน้า *</label>
+                <select name="prefix" value={formData.prefix} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl">
+                  <option value="">เลือก</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="นางสาว">นางสาว</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm mb-1">ชื่อ-นามสกุล *</label>
+                <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" />
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><label className="block text-sm mb-1">ประเภท *</label><select name="type" value={formData.type} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"><option value="">เลือก</option><option value="บุคลากร">บุคลากร</option><option value="นักศึกษา">นักศึกษา</option></select></div>
-              <div><label className="block text-sm mb-1">อีเมล *</label><input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"/><p className="text-xs text-slate-400 mt-1">บุคลากร: @rmutl.ac.th / นศ: @live.rmutl.ac.th</p></div>
+              <div>
+                <label className="block text-sm mb-1">ประเภท *</label>
+                <select name="type" value={formData.type} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl">
+                  <option value="">เลือก</option>
+                  <option value="บุคลากร">บุคลากร</option>
+                  <option value="นักศึกษา">นักศึกษา</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm mb-1">อีเมล *</label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"/>
+                <p className="text-xs text-slate-400 mt-1">บุคลากร: @rmutl.ac.th / นศ: @live.rmutl.ac.th</p>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><label className="block text-sm mb-1">เขตพื้นที่ *</label><select name="campus" value={formData.campus} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"><option value="">เลือก</option>{campuses.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-              <div><label className="block text-sm mb-1">เบอร์โทรศัพท์ *</label><input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" /></div>
+              <div>
+                <label className="block text-sm mb-1">เขตพื้นที่ *</label>
+                <select name="campus" value={formData.campus} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl">
+                  <option value="">เลือก</option>
+                  {campuses.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm mb-1">เบอร์โทรศัพท์ *</label>
+                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" />
+              </div>
             </div>
-            <div><label className="block text-sm mb-1">คณะ/หน่วยงาน *</label><select name="faculty" value={formData.faculty} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl"><option value="">เลือก</option>{faculties.map(f => <option key={f} value={f}>{f}</option>)}</select></div>
-            {formData.faculty === 'อื่นๆ โปรดระบุ' && <div><input type="text" name="facultyOther" value={formData.facultyOther} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" placeholder="โปรดระบุหน่วยงาน" /></div>}
-            <div><label className="block text-sm mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label><input type="text" name="allergy" value={formData.allergy} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" /></div>
-            <div className="bg-slate-50 p-4 rounded-xl mt-6 border"><label className="flex items-start gap-3"><input type="checkbox" name="pdpa" checked={formData.pdpa} onChange={handleChange} className="mt-1 w-4 h-4"/><span className="text-sm">ข้าพเจ้าได้อ่านและยอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล (PDPA)</span></label></div>
-            <div className="flex gap-4 pt-4"><button type="button" onClick={onBack} className="flex-1 px-4 py-3 bg-white border text-slate-600 rounded-xl">ยกเลิก</button><button type="submit" className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl">ยืนยัน</button></div>
+            <div>
+              <label className="block text-sm mb-1">คณะ/หน่วยงาน *</label>
+              <select name="faculty" value={formData.faculty} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl">
+                <option value="">เลือก</option>
+                {faculties.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+            {formData.faculty === 'อื่นๆ โปรดระบุ' && (
+              <div>
+                <input type="text" name="facultyOther" value={formData.facultyOther} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" placeholder="โปรดระบุหน่วยงาน" />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm mb-1">ประวัติแพ้อาหาร (ถ้ามี)</label>
+              <input type="text" name="allergy" value={formData.allergy} onChange={handleChange} className="w-full p-3 bg-slate-50 border rounded-xl" />
+            </div>
+            <div className="bg-slate-50 p-4 rounded-xl mt-6 border">
+              <label className="flex items-start gap-3">
+                <input type="checkbox" name="pdpa" checked={formData.pdpa} onChange={handleChange} className="mt-1 w-4 h-4"/>
+                <span className="text-sm">ข้าพเจ้าได้อ่านและยอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล (PDPA)</span>
+              </label>
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button type="button" onClick={onBack} className="flex-1 px-4 py-3 bg-white border text-slate-600 rounded-xl">ยกเลิก</button>
+              <button type="submit" className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl">ยืนยัน</button>
+            </div>
           </form>
         </div>
       );
@@ -218,6 +426,7 @@
       const [editForm, setEditForm] = useState({ fullName: '', phone: '', allergy: '' });
 
       if (!course) return null;
+      
       const courseRegs = regs.filter(r => r.courseId === course.courseId);
       const today = new Date().toISOString().split('T')[0];
       const isConfirmPeriod = course.confirmOpenDate && course.confirmCloseDate && today >= course.confirmOpenDate && today <= course.confirmCloseDate;
@@ -228,45 +437,125 @@
         return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">รอยืนยัน</span>;
       };
 
-      const openEditModal = (reg) => { setEditingReg(reg); setAuthEmail(''); setIsAuthed(false); setAuthError(''); setEditForm({ fullName: reg.fullName, phone: reg.phone, allergy: reg.allergy }); };
-      const handleVerify = (e) => { e.preventDefault(); if (authEmail === editingReg.email) { setIsAuthed(true); setAuthError(''); } else setAuthError('อีเมลไม่ถูกต้อง'); };
-      const handleSaveInfo = () => { setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, ...editForm } : r)); setEditingReg({ ...editingReg, ...editForm }); alert('สำเร็จ'); };
-      const updateStatus = (newStatus) => { setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, status: newStatus } : r)); setEditingReg({ ...editingReg, status: newStatus }); };
+      const openEditModal = (reg) => { 
+        setEditingReg(reg); 
+        setAuthEmail(''); 
+        setIsAuthed(false); 
+        setAuthError(''); 
+        setEditForm({ fullName: reg.fullName, phone: reg.phone, allergy: reg.allergy }); 
+      };
+
+      const handleVerify = (e) => { 
+        e.preventDefault(); 
+        if (authEmail === editingReg.email) { 
+          setIsAuthed(true); 
+          setAuthError(''); 
+        } else {
+          setAuthError('อีเมลไม่ถูกต้อง'); 
+        }
+      };
+
+      const handleSaveInfo = () => { 
+        setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, ...editForm } : r)); 
+        setEditingReg({ ...editingReg, ...editForm }); 
+        alert('สำเร็จ'); 
+      };
+
+      const updateStatus = (newStatus) => { 
+        setRegs(regs.map(r => r.regId === editingReg.regId ? { ...r, status: newStatus } : r)); 
+        setEditingReg({ ...editingReg, status: newStatus }); 
+      };
 
       return (
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-6">
-            <div><button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-2 flex items-center gap-1">← กลับ</button><h2 className="text-2xl font-semibold text-slate-800">รายชื่อผู้ลงทะเบียน</h2><p className="text-indigo-600 mt-1">{course.title}</p></div>
-            <div className="text-right bg-slate-50 p-3 rounded-xl"><p className="text-sm text-slate-500 mb-1">จำนวนผู้ลงทะเบียน</p><p className="text-2xl font-bold">{courseRegs.filter(r => r.status !== 'ยกเลิก').length} / {course.maxAttendees}</p></div>
+            <div>
+              <button onClick={onBack} className="text-sm text-slate-500 hover:text-indigo-600 mb-2 flex items-center gap-1">← กลับ</button>
+              <h2 className="text-2xl font-semibold text-slate-800">รายชื่อผู้ลงทะเบียน</h2>
+              <p className="text-indigo-600 mt-1">{course.title}</p>
+            </div>
+            <div className="text-right bg-slate-50 p-3 rounded-xl">
+              <p className="text-sm text-slate-500 mb-1">จำนวนผู้ลงทะเบียน</p>
+              <p className="text-2xl font-bold">{courseRegs.filter(r => r.status !== 'ยกเลิก').length} / {course.maxAttendees}</p>
+            </div>
           </div>
           <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-slate-50 text-slate-600"><tr><th className="p-4">ลำดับ</th><th className="p-4">ชื่อ-นามสกุล</th><th className="p-4">เขตพื้นที่</th><th className="p-4">คณะ/หน่วยงาน</th><th className="p-4">สถานะ</th><th className="p-4 text-center">จัดการ</th></tr></thead>
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  <th className="p-4">ลำดับ</th>
+                  <th className="p-4">ชื่อ-นามสกุล</th>
+                  <th className="p-4">เขตพื้นที่</th>
+                  <th className="p-4">คณะ/หน่วยงาน</th>
+                  <th className="p-4">สถานะ</th>
+                  <th className="p-4 text-center">จัดการ</th>
+                </tr>
+              </thead>
               <tbody className="divide-y divide-slate-100">
-                {courseRegs.length === 0 ? <tr><td colSpan="6" className="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr> : courseRegs.map((r, i) => (
-                  <tr key={r.regId} className="hover:bg-slate-50/50"><td className="p-4 text-slate-500">{i + 1}</td><td className="p-4 font-medium">{r.prefix}{r.fullName}</td><td className="p-4">{r.campus}</td><td className="p-4">{r.faculty}</td><td className="p-4">{getStatusBadge(r.status)}</td><td className="p-4 text-center"><button onClick={() => openEditModal(r)} className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg"><Edit size={18} /></button></td></tr>
+                {courseRegs.length === 0 ? (
+                  <tr><td colSpan="6" className="p-8 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียน</td></tr>
+                ) : courseRegs.map((r, i) => (
+                  <tr key={r.regId} className="hover:bg-slate-50/50">
+                    <td className="p-4 text-slate-500">{i + 1}</td>
+                    <td className="p-4 font-medium">{r.prefix}{r.fullName}</td>
+                    <td className="p-4">{r.campus}</td>
+                    <td className="p-4">{r.faculty}</td>
+                    <td className="p-4">{getStatusBadge(r.status)}</td>
+                    <td className="p-4 text-center">
+                      <button onClick={() => openEditModal(r)} className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg">
+                        <Edit size={18} />
+                      </button>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
           {editingReg && (
             <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-xl relative">
                 <button onClick={() => setEditingReg(null)} className="absolute top-4 right-4 text-slate-400 hover:bg-slate-100 rounded-full p-1"><XCircle size={24}/></button>
                 <h3 className="text-xl font-semibold mb-6 flex items-center gap-2"><Edit size={20} className="text-indigo-600"/> จัดการข้อมูล</h3>
                 {!isAuthed ? (
-                  <form onSubmit={handleVerify} className="space-y-4"><div className="bg-indigo-50 p-4 rounded-xl mb-4"><p className="text-sm">กรอกอีเมลเพื่อยืนยันสิทธิ์ของ <b>{editingReg.fullName}</b></p></div><div><input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="อีเมล" className="w-full p-3 border rounded-xl" /></div>{authError && <p className="text-xs text-red-500">{authError}</p>}<button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl">ยืนยัน</button></form>
+                  <form onSubmit={handleVerify} className="space-y-4">
+                    <div className="bg-indigo-50 p-4 rounded-xl mb-4">
+                      <p className="text-sm">กรอกอีเมลเพื่อยืนยันสิทธิ์ของ <b>{editingReg.fullName}</b></p>
+                    </div>
+                    <div>
+                      <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} required placeholder="อีเมล" className="w-full p-3 border rounded-xl" />
+                    </div>
+                    {authError && <p className="text-xs text-red-500">{authError}</p>}
+                    <button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl">ยืนยัน</button>
+                  </form>
                 ) : (
                   <div className="space-y-6">
                     <div className="space-y-4">
-                      <div><label className="text-xs">ชื่อ-นามสกุล</label><input type="text" value={editForm.fullName} onChange={e => setEditForm({...editForm, fullName: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" /></div>
-                      <div><label className="text-xs">เบอร์โทร</label><input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" /></div>
-                      <div><label className="text-xs">แพ้อาหาร</label><input type="text" value={editForm.allergy} onChange={e => setEditForm({...editForm, allergy: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" /></div>
+                      <div>
+                        <label className="text-xs">ชื่อ-นามสกุล</label>
+                        <input type="text" value={editForm.fullName} onChange={e => setEditForm({...editForm, fullName: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" />
+                      </div>
+                      <div>
+                        <label className="text-xs">เบอร์โทร</label>
+                        <input type="text" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" />
+                      </div>
+                      <div>
+                        <label className="text-xs">แพ้อาหาร</label>
+                        <input type="text" value={editForm.allergy} onChange={e => setEditForm({...editForm, allergy: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl" />
+                      </div>
                       <button onClick={handleSaveInfo} className="w-full p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">บันทึก</button>
                     </div>
                     <div className="space-y-3 pt-4 border-t">
-                      {editingReg.status === 'เข้าร่วม' ? <div className="p-3 bg-green-50 text-green-700 rounded-xl flex items-center justify-center gap-2"><CheckCircle size={18}/> ยืนยันเข้าร่วมแล้ว</div> : isConfirmPeriod ? <button onClick={() => updateStatus('เข้าร่วม')} className="w-full p-3 bg-green-600 text-white rounded-xl flex items-center justify-center gap-2"><CheckCircle size={18}/> ยืนยันเข้าร่วม</button> : <button disabled className="w-full p-3 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center gap-2"><Clock size={18}/> นอกช่วงเวลายืนยัน</button>}
-                      {editingReg.status !== 'ยกเลิก' && <button onClick={() => updateStatus('ยกเลิก')} className="w-full p-3 bg-white border border-red-200 text-red-600 rounded-xl flex items-center justify-center gap-2"><XCircle size={18}/> ยกเลิก</button>}
+                      {editingReg.status === 'เข้าร่วม' ? (
+                        <div className="p-3 bg-green-50 text-green-700 rounded-xl flex items-center justify-center gap-2"><CheckCircle size={18}/> ยืนยันเข้าร่วมแล้ว</div>
+                      ) : isConfirmPeriod ? (
+                        <button onClick={() => updateStatus('เข้าร่วม')} className="w-full p-3 bg-green-600 text-white rounded-xl flex items-center justify-center gap-2"><CheckCircle size={18}/> ยืนยันเข้าร่วม</button>
+                      ) : (
+                        <button disabled className="w-full p-3 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center gap-2"><Clock size={18}/> นอกช่วงเวลายืนยัน</button>
+                      )}
+                      {editingReg.status !== 'ยกเลิก' && (
+                        <button onClick={() => updateStatus('ยกเลิก')} className="w-full p-3 bg-white border border-red-200 text-red-600 rounded-xl flex items-center justify-center gap-2"><XCircle size={18}/> ยกเลิก</button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -281,9 +570,33 @@
       const [user, setUser] = useState('');
       const [pass, setPass] = useState('');
       const [err, setErr] = useState('');
-      const handleSubmit = (e) => { e.preventDefault(); if (user === 'admin' && pass === 'admin') onLogin(); else setErr('ข้อมูลไม่ถูกต้อง'); };
+      
+      const handleSubmit = (e) => { 
+        e.preventDefault(); 
+        if (user === 'admin' && pass === 'admin') onLogin(); 
+        else setErr('ข้อมูลไม่ถูกต้อง'); 
+      };
+
       return (
-        <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-sm border"><div className="text-center mb-8"><div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><LogIn /></div><h2 className="text-2xl font-semibold">Admin Login</h2></div><form onSubmit={handleSubmit} className="space-y-4">{err && <div className="p-3 bg-red-50 text-red-600 rounded-xl">{err}</div>}<div><label className="block text-sm mb-1">Username</label><input type="text" value={user} onChange={e=>setUser(e.target.value)} className="w-full p-3 border rounded-xl" /></div><div><label className="block text-sm mb-1">Password</label><input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full p-3 border rounded-xl" /></div><button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl">เข้าระบบ</button><button type="button" onClick={onBack} className="w-full p-3 text-slate-500 w-full text-center">กลับหน้าหลัก</button></form></div>
+        <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-3xl shadow-sm border">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><LogIn /></div>
+            <h2 className="text-2xl font-semibold">Admin Login</h2>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {err && <div className="p-3 bg-red-50 text-red-600 rounded-xl">{err}</div>}
+            <div>
+              <label className="block text-sm mb-1">Username</label>
+              <input type="text" value={user} onChange={e=>setUser(e.target.value)} className="w-full p-3 border rounded-xl" />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Password</label>
+              <input type="password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full p-3 border rounded-xl" />
+            </div>
+            <button type="submit" className="w-full p-3 bg-slate-800 text-white rounded-xl">เข้าระบบ</button>
+            <button type="button" onClick={onBack} className="w-full p-3 text-slate-500 text-center">กลับหน้าหลัก</button>
+          </form>
+        </div>
       );
     }
 
@@ -291,16 +604,125 @@
       const [isEditing, setIsEditing] = useState(false);
       const emptyCourse = { courseId: '', title: '', speaker: '', date: '', location: '', targetGroup: '', content: '', objective: '', note: '', openDate: '', closeDate: '', maxAttendees: 50, confirmOpenDate: '', confirmCloseDate: '' };
       const [editData, setEditData] = useState(emptyCourse);
-      const handleSave = (e) => { e.preventDefault(); if (editData.courseId) setCourses(courses.map(c => c.courseId === editData.courseId ? editData : c)); else setCourses([...courses, { ...editData, courseId: 'c' + Date.now() }]); setIsEditing(false); };
-      const handleDelete = (id) => { if(confirm('ต้องการลบ?')) setCourses(courses.filter(c => c.courseId !== id)); };
+      
+      const handleSave = (e) => { 
+        e.preventDefault(); 
+        if (editData.courseId) {
+          setCourses(courses.map(c => c.courseId === editData.courseId ? editData : c)); 
+        } else {
+          setCourses([...courses, { ...editData, courseId: 'c' + Date.now() }]); 
+        }
+        setIsEditing(false); 
+      };
+      
+      const handleDelete = (id) => { 
+        if(confirm('ต้องการลบ?')) setCourses(courses.filter(c => c.courseId !== id)); 
+      };
+      
       const handleChange = (e) => setEditData({...editData, [e.target.name]: e.target.value});
 
       if (isEditing) return (
-        <div className="bg-white p-6 md:p-8 rounded-3xl border max-w-4xl mx-auto"><h2 className="text-xl font-semibold mb-6">{editData.courseId ? 'แก้ไข' : 'เพิ่ม'}</h2><form onSubmit={handleSave} className="space-y-5"><div className="grid grid-cols-1 md:grid-cols-2 gap-5"><div className="md:col-span-2"><label className="text-sm">ชื่อ</label><input required name="title" value={editData.title} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">วิทยากร</label><input required name="speaker" value={editData.speaker} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">เป้าหมาย</label><input required name="targetGroup" value={editData.targetGroup} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">วันที่จัด</label><input required type="date" name="date" value={editData.date} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">สถานที่</label><input required name="location" value={editData.location} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div className="p-4 bg-slate-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4"><div className="md:col-span-2 border-b"><span className="font-semibold">รับสมัคร</span></div><div><input required type="date" name="openDate" value={editData.openDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><input required type="date" name="closeDate" value={editData.closeDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div></div><div className="p-4 bg-indigo-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4"><div className="md:col-span-2 border-b border-indigo-200"><span className="font-semibold text-indigo-800">ยืนยัน</span></div><div><input required type="date" name="confirmOpenDate" value={editData.confirmOpenDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><input required type="date" name="confirmCloseDate" value={editData.confirmCloseDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div></div><div><label className="text-sm">รับ(คน)</label><input required type="number" name="maxAttendees" value={editData.maxAttendees} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">หมายเหตุ</label><input name="note" value={editData.note} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div className="md:col-span-2"><label className="text-sm">เนื้อหา</label><textarea required name="content" value={editData.content} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div><div className="md:col-span-2"><label className="text-sm">วัตถุประสงค์</label><textarea required name="objective" value={editData.objective} onChange={handleChange} className="w-full p-2 border rounded-lg"/></div></div><div className="flex gap-4 pt-4"><button type="button" onClick={() => setIsEditing(false)} className="px-6 py-2 border rounded-xl">ยกเลิก</button><button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-xl">บันทึก</button></div></form></div>
+        <div className="bg-white p-6 md:p-8 rounded-3xl border max-w-4xl mx-auto">
+          <h2 className="text-xl font-semibold mb-6">{editData.courseId ? 'แก้ไข' : 'เพิ่ม'}</h2>
+          <form onSubmit={handleSave} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="md:col-span-2">
+                <label className="text-sm">ชื่อ</label>
+                <input required name="title" value={editData.title} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div>
+                <label className="text-sm">วิทยากร</label>
+                <input required name="speaker" value={editData.speaker} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div>
+                <label className="text-sm">เป้าหมาย</label>
+                <input required name="targetGroup" value={editData.targetGroup} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div>
+                <label className="text-sm">วันที่จัด</label>
+                <input required type="date" name="date" value={editData.date} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div>
+                <label className="text-sm">สถานที่</label>
+                <input required name="location" value={editData.location} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              
+              <div className="p-4 bg-slate-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 border-b"><span className="font-semibold">รับสมัคร</span></div>
+                <div>
+                  <input required type="date" name="openDate" value={editData.openDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+                </div>
+                <div>
+                  <input required type="date" name="closeDate" value={editData.closeDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+                </div>
+              </div>
+              
+              <div className="p-4 bg-indigo-50 rounded-xl md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 border-b border-indigo-200"><span className="font-semibold text-indigo-800">ยืนยัน</span></div>
+                <div>
+                  <input required type="date" name="confirmOpenDate" value={editData.confirmOpenDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+                </div>
+                <div>
+                  <input required type="date" name="confirmCloseDate" value={editData.confirmCloseDate} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm">รับ(คน)</label>
+                <input required type="number" name="maxAttendees" value={editData.maxAttendees} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div>
+                <label className="text-sm">หมายเหตุ</label>
+                <input name="note" value={editData.note} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm">เนื้อหา</label>
+                <textarea required name="content" value={editData.content} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-sm">วัตถุประสงค์</label>
+                <textarea required name="objective" value={editData.objective} onChange={handleChange} className="w-full p-2 border rounded-lg"/>
+              </div>
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-2 border rounded-xl">ยกเลิก</button>
+              <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-xl">บันทึก</button>
+            </div>
+          </form>
+        </div>
       );
 
       return (
-        <div className="space-y-6"><div className="flex justify-between"><h1 className="text-2xl font-semibold">จัดการหลักสูตร</h1><button onClick={() => { setEditData(emptyCourse); setIsEditing(true); }} className="flex gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl"><Plus size={16}/> เพิ่ม</button></div><div className="bg-white rounded-2xl border overflow-x-auto"><table className="w-full text-left text-sm"><thead className="bg-slate-50"><tr><th className="p-4">ชื่อ</th><th className="p-4">วันที่จัด</th><th className="p-4">ยอด</th><th className="p-4 text-right">จัดการ</th></tr></thead><tbody className="divide-y">{courses.map(c => { const count = regs.filter(r => r.courseId === c.courseId && r.status !== 'ยกเลิก').length; return <tr key={c.courseId}><td className="p-4">{c.title}</td><td className="p-4">{c.date}</td><td className="p-4">{count} / {c.maxAttendees}</td><td className="p-4 flex gap-2 justify-end"><button onClick={() => onManageRegs(c)} className="p-2 text-indigo-600"><Users size={16}/></button><button onClick={() => { setEditData(c); setIsEditing(true); }} className="p-2 text-indigo-600"><Edit size={16}/></button><button onClick={() => handleDelete(c.courseId)} className="p-2 text-red-600"><Trash2 size={16}/></button></td></tr>; })}</tbody></table></div></div>
+        <div className="space-y-6">
+          <div className="flex justify-between">
+            <h1 className="text-2xl font-semibold">จัดการหลักสูตร</h1>
+            <button onClick={() => { setEditData(emptyCourse); setIsEditing(true); }} className="flex gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl"><Plus size={16}/> เพิ่ม</button>
+          </div>
+          <div className="bg-white rounded-2xl border overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50">
+                <tr><th className="p-4">ชื่อ</th><th className="p-4">วันที่จัด</th><th className="p-4">ยอด</th><th className="p-4 text-right">จัดการ</th></tr>
+              </thead>
+              <tbody className="divide-y">
+                {courses.map(c => { 
+                  const count = regs.filter(r => r.courseId === c.courseId && r.status !== 'ยกเลิก').length; 
+                  return (
+                    <tr key={c.courseId}>
+                      <td className="p-4">{c.title}</td>
+                      <td className="p-4">{c.date}</td>
+                      <td className="p-4">{count} / {c.maxAttendees}</td>
+                      <td className="p-4 flex gap-2 justify-end">
+                        <button onClick={() => onManageRegs(c)} className="p-2 text-indigo-600"><Users size={16}/></button>
+                        <button onClick={() => { setEditData(c); setIsEditing(true); }} className="p-2 text-indigo-600"><Edit size={16}/></button>
+                        <button onClick={() => handleDelete(c.courseId)} className="p-2 text-red-600"><Trash2 size={16}/></button>
+                      </td>
+                    </tr>
+                  ); 
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       );
     }
 
@@ -308,6 +730,7 @@
       const [editingReg, setEditingReg] = useState(null);
       const defaultForm = { prefix: 'นาย', fullName: '', type: 'บุคลากร', email: '', campus: '', faculty: '', phone: '', allergy: '', status: 'รอยืนยัน' };
       const [form, setForm] = useState(defaultForm);
+      
       if (!course) return null;
       const courseRegs = regs.filter(r => r.courseId === course.courseId);
 
@@ -319,12 +742,29 @@
         const link = document.createElement('a');
         link.href = URL.createObjectURL(new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }));
         link.setAttribute('download', `รายชื่อ_${course.title}.csv`);
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link);
       };
 
-      const openForm = (reg = null) => { setForm(reg || defaultForm); setEditingReg(reg ? 'edit' : 'add'); };
-      const handleSave = (e) => { e.preventDefault(); if (editingReg === 'add') setRegs([...regs, { ...form, regId: 'r' + Date.now(), courseId: course.courseId }]); else setRegs(regs.map(r => r.regId === form.regId ? form : r)); setEditingReg(null); };
-      const handleDelete = (id) => { if (confirm('ลบข้อมูลนี้?')) setRegs(regs.filter(r => r.regId !== id)); };
+      const openForm = (reg = null) => { 
+        setForm(reg || defaultForm); 
+        setEditingReg(reg ? 'edit' : 'add'); 
+      };
+
+      const handleSave = (e) => { 
+        e.preventDefault(); 
+        if (editingReg === 'add') {
+          setRegs([...regs, { ...form, regId: 'r' + Date.now(), courseId: course.courseId }]); 
+        } else {
+          setRegs(regs.map(r => r.regId === form.regId ? form : r)); 
+        }
+        setEditingReg(null); 
+      };
+
+      const handleDelete = (id) => { 
+        if (confirm('ลบข้อมูลนี้?')) setRegs(regs.filter(r => r.regId !== id)); 
+      };
 
       const getStatusBadge = (status) => {
         if(status === 'เข้าร่วม') return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs">เข้าร่วม</span>;
@@ -333,10 +773,114 @@
       };
 
       return (
-        <div className="space-y-6"><div className="flex items-center gap-4 mb-2"><button onClick={onBack} className="p-2 bg-white border rounded-xl">← กลับ</button><div><h2 className="text-2xl font-semibold">จัดการรายชื่อ</h2><p className="text-indigo-600 text-sm mt-1">{course.title}</p></div></div><div className="bg-white rounded-2xl border p-6"><div className="flex justify-between items-center mb-6"><div className="text-sm">จำนวนทั้งหมด: <span className="font-semibold">{courseRegs.length}</span> คน</div><div className="flex gap-2"><button onClick={handleExportCSV} className="flex gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm"><FileSpreadsheet size={16}/> Export Excel</button><button onClick={() => openForm()} className="flex gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm"><UserPlus size={16}/> เพิ่ม</button></div></div><div className="overflow-x-auto rounded-xl border"><table className="w-full text-left text-sm"><thead className="bg-slate-50"><tr><th className="p-4">ลำดับ</th><th className="p-4">ชื่อ</th><th className="p-4">สถานะ</th><th className="p-4 text-right">จัดการ</th></tr></thead><tbody className="divide-y">{courseRegs.map((r, i) => (<tr key={r.regId}><td className="p-4">{i + 1}</td><td className="p-4 font-medium">{r.prefix}{r.fullName}</td><td className="p-4">{getStatusBadge(r.status)}</td><td className="p-4 flex gap-2 justify-end"><button onClick={() => openForm(r)} className="p-2 text-indigo-600"><Edit size={16}/></button><button onClick={() => handleDelete(r.regId)} className="p-2 text-red-600"><Trash2 size={16}/></button></td></tr>))}</tbody></table></div></div>{editingReg && (<div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50"><div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto"><div className="flex justify-between mb-6 pb-4 border-b"><h3 className="text-xl font-semibold">{editingReg === 'add' ? 'เพิ่ม' : 'แก้ไข'}</h3><button onClick={() => setEditingReg(null)} className="text-slate-400"><XCircle size={24}/></button></div><form onSubmit={handleSave} className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label className="text-sm">คำนำหน้า</label><select value={form.prefix} onChange={e=>setForm({...form, prefix: e.target.value})} className="w-full p-2 border rounded-lg"><option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option></select></div><div><label className="text-sm">ชื่อ-นามสกุล</label><input required value={form.fullName} onChange={e=>setForm({...form, fullName: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">ประเภท</label><select value={form.type} onChange={e=>setForm({...form, type: e.target.value})} className="w-full p-2 border rounded-lg"><option value="บุคลากร">บุคลากร</option><option value="นักศึกษา">นักศึกษา</option></select></div><div><label className="text-sm">อีเมล</label><input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">เขตพื้นที่</label><input required value={form.campus} onChange={e=>setForm({...form, campus: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">เบอร์โทร</label><input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">คณะ</label><input required value={form.faculty} onChange={e=>setForm({...form, faculty: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm">แพ้อาหาร</label><input value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})} className="w-full p-2 border rounded-lg"/></div><div><label className="text-sm font-semibold text-indigo-700">สถานะ</label><select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full p-2 border rounded-lg bg-indigo-50"><option value="รอยืนยัน">รอยืนยัน</option><option value="เข้าร่วม">เข้าร่วม</option><option value="ยกเลิก">ยกเลิก</option></select></div></div><div className="flex gap-4 pt-4"><button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl">บันทึก</button></div></form></div></div>)}</div>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4 mb-2">
+            <button onClick={onBack} className="p-2 bg-white border rounded-xl">← กลับ</button>
+            <div>
+              <h2 className="text-2xl font-semibold">จัดการรายชื่อ</h2>
+              <p className="text-indigo-600 text-sm mt-1">{course.title}</p>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl border p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div className="text-sm">จำนวนทั้งหมด: <span className="font-semibold">{courseRegs.length}</span> คน</div>
+              <div className="flex gap-2">
+                <button onClick={handleExportCSV} className="flex gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm"><FileSpreadsheet size={16}/> Export Excel</button>
+                <button onClick={() => openForm()} className="flex gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm"><UserPlus size={16}/> เพิ่ม</button>
+              </div>
+            </div>
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50">
+                  <tr><th className="p-4">ลำดับ</th><th className="p-4">ชื่อ</th><th className="p-4">สถานะ</th><th className="p-4 text-right">จัดการ</th></tr>
+                </thead>
+                <tbody className="divide-y">
+                  {courseRegs.map((r, i) => (
+                    <tr key={r.regId}>
+                      <td className="p-4">{i + 1}</td>
+                      <td className="p-4 font-medium">{r.prefix}{r.fullName}</td>
+                      <td className="p-4">{getStatusBadge(r.status)}</td>
+                      <td className="p-4 flex gap-2 justify-end">
+                        <button onClick={() => openForm(r)} className="p-2 text-indigo-600"><Edit size={16}/></button>
+                        <button onClick={() => handleDelete(r.regId)} className="p-2 text-red-600"><Trash2 size={16}/></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {editingReg && (
+            <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between mb-6 pb-4 border-b">
+                  <h3 className="text-xl font-semibold">{editingReg === 'add' ? 'เพิ่ม' : 'แก้ไข'}</h3>
+                  <button onClick={() => setEditingReg(null)} className="text-slate-400"><XCircle size={24}/></button>
+                </div>
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm">คำนำหน้า</label>
+                      <select value={form.prefix} onChange={e=>setForm({...form, prefix: e.target.value})} className="w-full p-2 border rounded-lg">
+                        <option value="นาย">นาย</option>
+                        <option value="นาง">นาง</option>
+                        <option value="นางสาว">นางสาว</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm">ชื่อ-นามสกุล</label>
+                      <input required value={form.fullName} onChange={e=>setForm({...form, fullName: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm">ประเภท</label>
+                      <select value={form.type} onChange={e=>setForm({...form, type: e.target.value})} className="w-full p-2 border rounded-lg">
+                        <option value="บุคลากร">บุคลากร</option>
+                        <option value="นักศึกษา">นักศึกษา</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm">อีเมล</label>
+                      <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm">เขตพื้นที่</label>
+                      <input required value={form.campus} onChange={e=>setForm({...form, campus: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm">เบอร์โทร</label>
+                      <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm">คณะ</label>
+                      <input required value={form.faculty} onChange={e=>setForm({...form, faculty: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm">แพ้อาหาร</label>
+                      <input value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})} className="w-full p-2 border rounded-lg"/>
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold text-indigo-700">สถานะ</label>
+                      <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full p-2 border rounded-lg bg-indigo-50">
+                        <option value="รอยืนยัน">รอยืนยัน</option>
+                        <option value="เข้าร่วม">เข้าร่วม</option>
+                        <option value="ยกเลิก">ยกเลิก</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 pt-4">
+                    <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl">บันทึก</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
       );
     }
 
+    // --- RENDER APP ---
     const root = createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
