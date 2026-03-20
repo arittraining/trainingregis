@@ -69,9 +69,9 @@
                     <h1 class="text-xl font-bold leading-none text-gray-800">RMUTL <span class="text-rmutl-orange">TRAINING</span></h1>
                 </div>
             </div>
-            <button onclick="navigate('dashboard')" class="text-sm font-medium text-gray-500 hover:text-rmutl-orange transition-colors">
+            <!-- <button onclick="navigate('dashboard')" class="text-sm font-medium text-gray-500 hover:text-rmutl-orange transition-colors">
                 <i class="fa-solid fa-house mr-1"></i> หน้าแรก
-            </button>
+            </button> -->
             <button onclick="navigate('admin-login')" class="text-sm font-medium text-gray-500 hover:text-rmutl-orange transition-colors">
                 <i class="fa-solid fa-user-shield mr-1"></i> ผู้ดูแลระบบ
             </button>
@@ -587,7 +587,7 @@
                     <div>
                         <div class="flex justify-between items-start mb-4">
                             <span class="text-xs font-bold px-3 py-1 bg-orange-100 text-rmutl-orange rounded-full">เปิดรับ ${c.maxPax} ท่าน</span>
-                            ${c-doclink ? `<a href="${c-doclink}" target="_blank" class="text-xs text-blue-500 hover:underline"><i class="fa-solid fa-download"></i> เอกสาร</a>` : ''}
+                            ${c-remarks ? `<a href="${c-remarks}" target="_blank" class="text-xs text-blue-500 hover:underline"><i class="fa-solid fa-download"></i> เอกสาร</a>` : ''}
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-2 leading-tight">${c.name}</h3>
                         <div class="space-y-2 text-sm text-gray-600 mb-6">
