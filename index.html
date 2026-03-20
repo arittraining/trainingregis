@@ -328,7 +328,6 @@
         </div>
 
         <!-- Login / Admin views as requested in original logic -->
-        <!-- ... (Keeping existing structure but with consistent styling) ... -->
         <div id="view-admin-login" class="hidden max-w-sm mx-auto pt-20">
             <div class="bg-white rounded-[32px] p-10 shadow-2xl border border-gray-100">
                 <div class="w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center text-white shadow-lg mx-auto mb-8">
@@ -472,6 +471,46 @@
                 document.getElementById('reg-title').innerText = data.Title;
                 document.getElementById('reg-date').innerText = data.Date;
                 document.getElementById('form-course-id').value = data.ID;
+            }
+        }
+
+        // Admin Login function
+        function loginAdmin() {
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            // ตรวจสอบข้อมูล Login
+            if (user === 'admin' && pass === 'admin') {
+                isAdmin = true;
+                const modal = document.getElementById('modal');
+                const content = document.getElementById('modal-content');
+                
+                content.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fa-solid fa-lock-open"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-2">เข้าสู่ระบบสำเร็จ</h3>
+                        <p class="text-gray-500 mb-8">ยินดีต้อนรับ เจ้าหน้าที่ดูแลระบบ</p>
+                        <button onclick="closeModal(); navigate('attendees')" class="px-10 py-3 btn-primary rounded-xl font-bold">ไปที่หน้าจัดการรายชื่อ</button>
+                    </div>
+                `;
+                modal.classList.remove('hidden');
+            } else {
+                const modal = document.getElementById('modal');
+                const content = document.getElementById('modal-content');
+                
+                content.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-2">ข้อมูลไม่ถูกต้อง</h3>
+                        <p class="text-gray-500 mb-8">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</p>
+                        <button onclick="closeModal()" class="px-10 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold">ตกลง</button>
+                    </div>
+                `;
+                modal.classList.remove('hidden');
             }
         }
 
