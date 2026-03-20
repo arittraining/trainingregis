@@ -29,8 +29,8 @@
     </script>
     <style>
         body { background-color: theme('colors.background'); color: #1e293b; }
-        .btn-primary { background-color: theme('colors.rmutl.orange'); color: white; transition: all 0.3s ease; }
-        .btn-primary:hover:not(:disabled) { background-color: theme('colors.rmutl.dark'); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3); }
+        .btn-primary { background-color: #f37021; color: white; transition: all 0.3s ease; }
+        .btn-primary:hover:not(:disabled) { background-color: #d65a12; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .card-ui { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s ease; }
@@ -269,7 +269,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold">ระบบจัดการหลังบ้าน</h2>
                 <div class="flex gap-2">
-                    <button onclick="openCourseModal()" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition">
+                    <button onclick="openCourseModal()" style="background-color: #10b981;" class="text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-80 transition shadow">
                         <i class="fa-solid fa-plus mr-1"></i> เพิ่มหลักสูตร
                     </button>
                     <button onclick="adminLogout()" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition">
@@ -436,9 +436,13 @@
                         </div>
                     </div>
                     
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold mb-1">หมายเหตุ / เอกสารโครงการ (Link)</label>
-                        <input type="text" id="c-remarks" class="input-field py-2">
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold mb-1">หมายเหตุ</label>
+                        <input type="text" id="c-remarks" class="input-field py-2" placeholder="ข้อความหมายเหตุเพิ่มเติม">
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold mb-1">เอกสารโครงการ (Link)</label>
+                        <input type="url" id="c-doclink" class="input-field py-2" placeholder="https://...">
                     </div>
                 </div>
                 
@@ -572,7 +576,7 @@
                 } else if (isFull) {
                     btnHTML = `<button disabled class="w-full py-3 bg-red-100 text-red-600 font-bold rounded-xl mt-4">เต็มแล้ว</button>`;
                 } else {
-                    btnHTML = `<button onclick="openRegister('${c.id}')" class="w-full py-3 btn-primary font-bold rounded-xl mt-4 shadow-lg">ลงทะเบียนเข้าอบรม</button>`;
+                    btnHTML = `<button onclick="openRegister('${c.id}')" class="w-full py-3 btn-primary font-bold rounded-xl mt-4 shadow-lg text-white">ลงทะเบียนเข้าอบรม</button>`;
                 }
 
                 return `
