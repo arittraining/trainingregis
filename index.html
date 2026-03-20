@@ -466,7 +466,7 @@
 
         // ================= API CALLER =================
         async function apiCall(action, data = {}) {
-            if(SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyyjF1tQ9yk_8GWsd6EIykH0mVlkDlw3OJwvycz7Bth2AjxqV6Alw2xlGFv0cwIogbN/exec") {
+            if(!SCRIPT_URL) {
                 showMsg('เกิดข้อผิดพลาด', 'ยังไม่ได้ตั้งค่า SCRIPT_URL กรุณาใส่ URL ของ Web App ในโค้ดก่อนใช้งาน', 'error');
                 return null;
             }
