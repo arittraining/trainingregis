@@ -3,745 +3,910 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RMUTL Training Registration</title>
-    <!-- Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>RMUTL Training Registration System</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rmutl: { orange: '#f37021', dark: '#d65a12', light: '#fff3eb' },
+                        surface: '#ffffff',
+                        background: '#f8fafc',
+                    },
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --rmutl-orange: #f37021;
-            --rmutl-orange-light: #fff3eb;
-            --rmutl-orange-dark: #d65a12;
-            --surface: #ffffff;
-            --background: #f8fafc;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-        }
+        body { background-color: theme('colors.background'); color: #1e293b; }
+        .btn-primary { background-color: theme('colors.rmutl.orange'); color: white; transition: all 0.3s ease; }
+        .btn-primary:hover:not(:disabled) { background-color: theme('colors.rmutl.dark'); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .card-ui { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .card-ui:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: theme('colors.rmutl.light'); }
+        
+        /* Spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #f37021; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Transition */
+        .view-section { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background-color: var(--background);
-            color: var(--text-main);
-            scroll-behavior: smooth;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .btn-primary { 
-            background-color: var(--rmutl-orange); 
-            color: white; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(243, 112, 33, 0.2);
-        }
-        .btn-primary:hover { 
-            background-color: var(--rmutl-orange-dark); 
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(243, 112, 33, 0.3);
-        }
-        .btn-primary:active { transform: translateY(0); }
-
-        .card-modern { 
-            background: var(--surface); 
-            border-radius: 20px; 
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            transition: all 0.4s ease;
-        }
-        .card-modern:hover { 
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-            border-color: var(--rmutl-orange);
-        }
-
-        .nav-link { 
-            position: relative;
-            color: var(--text-muted);
-            transition: color 0.3s;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--rmutl-orange);
-            transition: all 0.3s;
-            transform: translateX(-50%);
-        }
-        .nav-link:hover { color: var(--rmutl-orange); }
-        .nav-active { color: var(--rmutl-orange); font-weight: 600; }
-        .nav-active::after { width: 80%; }
-
-        .status-pill { 
-            padding: 0.35rem 1rem; 
-            border-radius: 100px; 
-            font-size: 0.75rem; 
-            font-weight: 600;
-            letter-spacing: 0.025em;
-        }
-
-        .input-focus {
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-        .input-focus:focus {
-            border-color: var(--rmutl-orange);
-            ring: 4px;
-            ring-color: rgba(243, 112, 33, 0.1);
-            outline: none;
-        }
-
-        /* Hero Section Gradient */
-        .hero-gradient {
-            background: linear-gradient(135deg, #f37021 0%, #ff9a5c 100%);
-        }
-
-        /* Glass effect for modals */
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
+        /* Custom Input */
+        .input-field { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; font-size: 14px; transition: all 0.2s; outline: none; }
+        .input-field:focus { border-color: theme('colors.rmutl.orange'); box-shadow: 0 0 0 3px theme('colors.rmutl.light'); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="flex flex-col min-h-screen">
 
-    <!-- Header & Navigation -->
-    <header class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-4 cursor-pointer group" onclick="navigate('dashboard')">
-                <div class="w-12 h-12 hero-gradient rounded-2xl flex items-center justify-center text-white shadow-lg transform group-hover:rotate-6 transition-transform">
-                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+    <!-- Loading Overlay for API Calls -->
+    <div id="api-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[200] hidden items-center justify-center flex-col">
+        <div class="loader mb-4"></div>
+        <p class="text-rmutl-orange font-semibold tracking-wider animate-pulse">กำลังประมวลผลข้อมูล...</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('dashboard')">
+                <div class="w-10 h-10 bg-gradient-to-br from-rmutl-orange to-orange-400 rounded-lg flex items-center justify-center text-white shadow">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight text-gray-800">RMUTL <span class="text-[#f37021]">Training</span></h1>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Registration System</p>
+                    <h1 class="text-xl font-bold leading-none text-gray-800">RMUTL <span class="text-rmutl-orange">TRAINING</span></h1>
                 </div>
             </div>
-            <nav class="hidden md:flex gap-8 items-center">
-                <a onclick="navigate('dashboard')" id="nav-dashboard" class="nav-link nav-active text-sm font-medium cursor-pointer">หน้าหลัก</a>
-                <a onclick="navigate('attendees')" id="nav-attendees" class="nav-link text-sm font-medium cursor-pointer">ตรวจสอบรายชื่อ</a>
-                <div class="h-6 w-[1px] bg-gray-200"></div>
-                <button onclick="navigate('admin-login')" id="nav-admin" class="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-colors">
-                    <i class="fa-solid fa-lock text-[10px] text-gray-400"></i>
-                    สำหรับเจ้าหน้าที่
-                </button>
-            </nav>
-            <!-- Mobile Menu Toggle (Simplified for now) -->
-            <button class="md:hidden text-gray-500 text-2xl">
-                <i class="fa-solid fa-bars-staggered"></i>
+            <button onclick="navigate('admin-login')" class="text-sm font-medium text-gray-500 hover:text-rmutl-orange transition-colors">
+                <i class="fa-solid fa-user-shield mr-1"></i> ผู้ดูแลระบบ
             </button>
         </div>
-    </header>
+    </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-10" id="app">
+    <main class="flex-grow max-w-6xl mx-auto w-full p-4 md:p-6 mb-10">
         
-        <!-- Dashboard View -->
-        <div id="view-dashboard" class="space-y-10">
-            <section class="relative overflow-hidden rounded-[32px] hero-gradient p-10 md:p-16 text-white shadow-2xl">
-                <div class="relative z-10 max-w-2xl">
-                    <span class="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-6 uppercase tracking-wider">RMUTL Lifelong Learning</span>
-                    <h2 class="text-4xl md:text-5xl font-black mb-6 leading-tight">ยกระดับทักษะของคุณ <br>สู่มืออาชีพ</h2>
-                    <p class="text-white/80 text-lg mb-8 leading-relaxed">สำนักวิทยบริการและเทคโนโลยีสารสนเทศ มทร.ล้านนา สนับสนุนการเรียนรู้ตลอดชีวิตด้วยหลักสูตรที่ทันสมัย</p>
-                    <div class="flex gap-4">
-                        <button onclick="document.getElementById('course-section').scrollIntoView()" class="px-8 py-3 bg-white text-[#f37021] rounded-xl font-bold shadow-lg hover:bg-orange-50 transition-colors">ดูหลักสูตรทั้งหมด</button>
-                    </div>
-                </div>
-                <!-- Decorative Elements -->
-                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-                <div class="absolute right-10 top-10 w-40 h-40 bg-orange-300/20 rounded-full blur-2xl"></div>
-            </section>
-
-            <div id="course-section" class="pt-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <h3 class="text-2xl font-black text-gray-800">หลักสูตรที่เปิดรับสมัคร</h3>
-                        <div class="h-1 w-12 bg-rmutl-orange mt-2 rounded-full"></div>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border text-sm text-gray-500">
-                            <i class="fa-solid fa-filter"></i> ทั้งหมด
-                        </span>
-                    </div>
-                </div>
-
-                <div id="course-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Skeleton -->
-                    <div class="animate-pulse bg-white p-8 rounded-[24px] h-80 border shadow-sm"></div>
-                    <div class="animate-pulse bg-white p-8 rounded-[24px] h-80 border shadow-sm"></div>
-                    <div class="animate-pulse bg-white p-8 rounded-[24px] h-80 border shadow-sm"></div>
-                </div>
+        <!-- ================= VIEW: DASHBOARD ================= -->
+        <section id="view-dashboard" class="view-section active space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800">หลักสูตรอบรมที่เปิดรับสมัคร</h2>
+                <p class="text-gray-500 mt-1">เลือกลงทะเบียนหลักสูตรอบรม หรือตรวจสอบรายชื่อผู้เข้าร่วม</p>
             </div>
-        </div>
+            
+            <div id="dashboard-loading" class="py-20 text-center hidden">
+                <div class="loader mb-4"></div>
+                <p class="text-gray-400">กำลังโหลดหลักสูตร...</p>
+            </div>
 
-        <!-- Registration Form View -->
-        <div id="view-register" class="hidden max-w-3xl mx-auto">
-            <div class="bg-white rounded-[32px] shadow-xl overflow-hidden border border-gray-100">
-                <div class="h-3 hero-gradient"></div>
-                <div class="p-8 md:p-12">
-                    <button onclick="navigate('dashboard')" class="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-rmutl-orange mb-8 transition-colors">
-                        <i class="fa-solid fa-chevron-left"></i> ย้อนกลับ
-                    </button>
-                    
-                    <div class="mb-10">
-                        <h2 class="text-3xl font-black text-gray-800 mb-2" id="reg-title">ชื่อหลักสูตร</h2>
-                        <div class="flex items-center gap-4 text-gray-500 text-sm">
-                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> <span id="reg-date">วันที่อบรม</span></span>
-                            <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> 09:00 - 16:30 น.</span>
-                        </div>
+            <div id="course-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Courses injected here -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW: REGISTER FORM ================= -->
+        <section id="view-register" class="view-section">
+            <div class="max-w-3xl mx-auto">
+                <button onclick="navigate('dashboard')" class="text-gray-500 hover:text-rmutl-orange mb-6 font-medium">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>ย้อนกลับ
+                </button>
+
+                <div class="card-ui p-6 md:p-8">
+                    <div class="text-center mb-8 border-b pb-6">
+                        <span class="text-xs font-bold text-rmutl-orange uppercase tracking-widest bg-rmutl-light px-3 py-1 rounded-full">Registration Form</span>
+                        <h2 class="text-2xl font-bold text-gray-800 mt-4" id="reg-course-title">ชื่อหลักสูตร</h2>
+                        <p class="text-gray-500 mt-2 text-sm">วันที่อบรม: <span id="reg-course-date"></span></p>
                     </div>
-                    
-                    <form id="regForm" class="space-y-8">
-                        <input type="hidden" id="form-course-id">
+
+                    <form id="form-register" class="space-y-5">
+                        <input type="hidden" id="reg-course-id">
                         
-                        <div class="space-y-6">
-                            <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest">ข้อมูลผู้สมัคร</h4>
-                            <div class="grid md:grid-cols-12 gap-6">
-                                <div class="md:col-span-3">
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">คำนำหน้า</label>
-                                    <select id="form-prefix" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                        <option value="นาย">นาย</option>
-                                        <option value="นาง">นาง</option>
-                                        <option value="นางสาว">นางสาว</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-9">
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">ชื่อ-นามสกุล</label>
-                                    <input type="text" id="form-name" placeholder="ภาษาไทย" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">คำนำหน้า</label>
+                                <select id="reg-prefix" required class="input-field">
+                                    <option value="">เลือก</option>
+                                    <option value="นาย">นาย</option>
+                                    <option value="นาง">นาง</option>
+                                    <option value="นางสาว">นางสาว</option>
+                                </select>
                             </div>
-
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">ประเภท</label>
-                                    <select id="form-type" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                        <option value="บุคลากร">บุคลากร</option>
-                                        <option value="นักศึกษา">นักศึกษา</option>
-                                        <option value="บุคคลภายนอก">บุคคลภายนอก</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">อีเมล (RMUTL Email)</label>
-                                    <input type="email" id="form-email" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" placeholder="example@rmutl.ac.th" required>
-                                </div>
-                            </div>
-
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">เขตพื้นที่</label>
-                                    <select id="form-campus" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                        <option value="เชียงใหม่">เชียงใหม่</option>
-                                        <option value="เชียงราย">เชียงราย</option>
-                                        <option value="ลำปาง">ลำปาง</option>
-                                        <option value="ตาก">ตาก</option>
-                                        <option value="น่าน">น่าน</option>
-                                        <option value="พิษณุโลก">พิษณุโลก</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">คณะ / หน่วยงาน</label>
-                                    <select id="form-faculty" onchange="toggleOtherFaculty()" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                        <option>คณะวิศวกรรมศาสตร์</option>
-                                        <option>คณะบริหารธุรกิจและศิลปศาสตร์</option>
-                                        <option>คณะศิลปกรรมและสถาปัตยกรรมศาสตร์</option>
-                                        <option>คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร</option>
-                                        <option>วิทยาลัยเทคโนโลยีและสหวิทยาการ</option>
-                                        <option>สำนักงานอธิการบดี</option>
-                                        <option>อื่นๆ โปรดระบุ</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div id="faculty-other-container" class="hidden animate-fade-in">
-                                <label class="block text-sm font-bold text-gray-700 mb-2">ระบุหน่วยงานของคุณ</label>
-                                <input type="text" id="form-faculty-other" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus">
-                            </div>
-
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">เบอร์โทรศัพท์ติดต่อ</label>
-                                    <input type="tel" id="form-phone" placeholder="08x-xxxxxxx" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">ข้อจำกัดด้านอาหาร</label>
-                                    <input type="text" id="form-allergy" placeholder="เช่น มังสวิรัติ, แพ้กุ้ง (ถ้าไม่มีเว้นว่าง)" class="w-full bg-gray-50 border-gray-200 rounded-xl p-3 input-focus">
-                                </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                                <input type="text" id="reg-fullname" required class="input-field" placeholder="มงคล เรียนดี">
                             </div>
                         </div>
 
-                        <div class="p-6 rounded-2xl bg-orange-50 border border-orange-100">
-                            <div class="flex gap-4">
-                                <div class="mt-1">
-                                    <input type="checkbox" id="form-consent" class="w-5 h-5 rounded text-rmutl-orange focus:ring-rmutl-orange cursor-pointer" required>
-                                </div>
-                                <label for="form-consent" class="text-xs text-orange-800 leading-relaxed cursor-pointer">
-                                    <strong>ยินยอมให้จัดเก็บข้อมูล (PDPA):</strong> ข้าพเจ้ายินยอมให้ มทร.ล้านนา เก็บรวบรวมและใช้ข้อมูลส่วนบุคคลนี้เพื่อวัตถุประสงค์ในการจัดโครงการอบรม การจัดทำใบประกาศนียบัตร และการติดต่อสื่อสารเกี่ยวกับโครงการนี้เท่านั้น
-                                </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">ประเภท</label>
+                                <select id="reg-type" required class="input-field" onchange="validateEmailRule()">
+                                    <option value="">เลือกประเภท</option>
+                                    <option value="บุคลากร">บุคลากร</option>
+                                    <option value="นักศึกษา">นักศึกษา</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">อีเมล</label>
+                                <input type="email" id="reg-email" required class="input-field" placeholder="ระบุอีเมลตามประเภทที่เลือก">
+                                <p id="email-hint" class="text-xs text-gray-400 mt-1">กรุณาเลือกประเภทก่อน</p>
                             </div>
                         </div>
 
-                        <div class="flex flex-col md:flex-row gap-4 pt-4">
-                            <button type="button" onclick="navigate('dashboard')" class="flex-1 px-8 py-4 border-2 border-gray-100 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 transition-all">ยกเลิก</button>
-                            <button type="submit" class="flex-1 btn-primary px-8 py-4 rounded-2xl font-bold">ส่งข้อมูลการลงทะเบียน</button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">เขตพื้นที่</label>
+                                <select id="reg-campus" required class="input-field">
+                                    <option value="">เลือกเขตพื้นที่</option>
+                                    <option value="เชียงใหม่">เชียงใหม่</option>
+                                    <option value="เชียงราย">เชียงราย</option>
+                                    <option value="ลำปาง">ลำปาง</option>
+                                    <option value="ตาก">ตาก</option>
+                                    <option value="น่าน">น่าน</option>
+                                    <option value="พิษณุโลก">พิษณุโลก</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์</label>
+                                <input type="tel" id="reg-phone" required class="input-field" placeholder="08XXXXXXXX" pattern="[0-9]{9,10}">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">คณะ/หน่วยงาน</label>
+                            <select id="reg-faculty" required class="input-field">
+                                <option value="">เลือกคณะ/หน่วยงาน</option>
+                                <option>คณะวิศวกรรมศาสตร์</option>
+                                <option>คณะบริหารธุรกิจและศิลปศาสตร์</option>
+                                <option>คณะศิลปกรรมและสถาปัตยกรรมศาสตร์</option>
+                                <option>คณะวิทยาศาสตร์และเทคโนโลยีการเกษตร</option>
+                                <option>วิทยาลัยเทคโนโลยีและสหวิทยาการ</option>
+                                <option>สำนักงานอธิการบดี</option>
+                                <option>สำนักส่งเสริมวิชาการและงานทะเบียน</option>
+                                <option>สำนักวิทยบริการและเทคโนโลยีสารสนเทศ</option>
+                                <option>สถาบันถ่ายทอดเทคโนโลยีสู่ชุมชน</option>
+                                <option>กองบริหารงานบุคคล</option>
+                                <option>อื่นๆ</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">อาหารแพ้ / อาหารที่งด (ถ้ามี)</label>
+                            <input type="text" id="reg-allergy" class="input-field" placeholder="เช่น แพ้อาหารทะเล, มังสวิรัติ, ไม่ทานเนื้อวัว (ถ้าไม่มีเว้นว่างได้)">
+                        </div>
+
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mt-6">
+                            <h4 class="text-sm font-bold text-gray-800 mb-2">นโยบายความเป็นส่วนตัว (PDPA)</h4>
+                            <p class="text-xs text-gray-500 mb-3 leading-relaxed">
+                                การขอความยินยอมจัดเก็บข้อมูล PDPA: ระบบมีความจำเป็นต้องใช้ข้อมูลส่วนบุคคลของท่าน เพื่อประโยชน์ในการบริหารจัดการ การลงทะเบียน และการติดต่อประสานงาน สำหรับการประชุม/อบรม/สัมมนา ของมหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา
+                            </p>
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" id="reg-pdpa" required class="mt-1 w-4 h-4 text-rmutl-orange focus:ring-rmutl-orange border-gray-300 rounded">
+                                <span class="text-sm font-semibold text-gray-700">ข้าพเจ้าได้อ่านและยอมรับเงื่อนไขการใช้ข้อมูลส่วนบุคคล</span>
+                            </label>
+                        </div>
+
+                        <div class="flex gap-4 pt-4 border-t">
+                            <button type="button" onclick="navigate('dashboard')" class="w-1/3 py-3 rounded-xl border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition">ยกเลิก</button>
+                            <button type="submit" class="w-2/3 py-3 rounded-xl btn-primary font-bold text-lg">ยืนยันการลงทะเบียน</button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Attendees List View -->
-        <div id="view-attendees" class="hidden space-y-8 animate-fade-in">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <!-- ================= VIEW: ATTENDEES ================= -->
+        <section id="view-attendees" class="view-section">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-3xl font-black text-gray-800">ตรวจสอบรายชื่อ</h2>
-                    <p class="text-gray-500 mt-1">รายชื่อผู้ที่ยืนยันการเข้าร่วมโครงการในระบบ</p>
-                </div>
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="attendee-search" placeholder="ค้นหาชื่อหรือหน่วยงาน..." class="pl-12 pr-6 py-3 bg-white border border-gray-200 rounded-2xl w-full md:w-80 shadow-sm focus:ring-2 focus:ring-orange-100 outline-none transition-all" onkeyup="filterAttendees()">
+                    <button onclick="navigate('dashboard')" class="text-gray-500 hover:text-rmutl-orange mb-4 font-medium block">
+                        <i class="fa-solid fa-arrow-left mr-2"></i>กลับหน้าหลัก
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800" id="att-course-title">รายชื่อผู้ลงทะเบียน</h2>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[24px] shadow-xl border border-gray-100 overflow-hidden">
+            <div class="card-ui overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100 text-[10px] uppercase font-bold tracking-widest text-gray-400">
-                                <th class="px-8 py-5">ลำดับ/สถานะ</th>
-                                <th class="px-8 py-5">ชื่อ-นามสกุล</th>
-                                <th class="px-8 py-5">ชื่อหลักสูตรอบรม</th>
-                                <th class="px-8 py-5">หน่วยงาน</th>
-                                <th class="px-8 py-5 text-center">Action</th>
+                    <table class="w-full text-left whitespace-nowrap">
+                        <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b">
+                            <tr>
+                                <th class="px-6 py-4">ลำดับ</th>
+                                <th class="px-6 py-4">ชื่อ-นามสกุล</th>
+                                <th class="px-6 py-4">เขตพื้นที่</th>
+                                <th class="px-6 py-4">คณะ/หน่วยงาน</th>
+                                <th class="px-6 py-4 text-center">สถานะ</th>
+                                <th class="px-6 py-4 text-center">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="attendee-table-body" class="divide-y divide-gray-50 text-sm">
+                        <tbody id="attendee-list" class="divide-y divide-gray-100 text-sm">
                             <!-- Injected -->
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Login / Admin views as requested in original logic -->
-        <div id="view-admin-login" class="hidden max-w-sm mx-auto pt-20">
-            <div class="bg-white rounded-[32px] p-10 shadow-2xl border border-gray-100">
-                <div class="w-16 h-16 hero-gradient rounded-2xl flex items-center justify-center text-white shadow-lg mx-auto mb-8">
-                    <i class="fa-solid fa-shield-halved text-2xl"></i>
-                </div>
-                <h2 class="text-2xl font-black text-center mb-2">เจ้าหน้าที่</h2>
-                <p class="text-center text-gray-400 text-sm mb-8">กรุณาเข้าสู่ระบบเพื่อจัดการข้อมูล</p>
-                
-                <div class="space-y-4">
-                    <div class="relative">
-                        <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="admin-user" placeholder="ชื่อผู้ใช้งาน" class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 transition-all">
+        <!-- ================= VIEW: ADMIN LOGIN ================= -->
+        <section id="view-admin-login" class="view-section">
+            <div class="max-w-md mx-auto mt-10">
+                <button onclick="navigate('dashboard')" class="text-gray-500 hover:text-rmutl-orange mb-6 font-medium">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>กลับหน้าผู้ใช้งานทั่วไป
+                </button>
+                <div class="card-ui p-8 text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-500">
+                        <i class="fa-solid fa-lock text-2xl"></i>
                     </div>
-                    <div class="relative">
-                        <i class="fa-regular fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="password" id="admin-pass" placeholder="รหัสผ่าน" class="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-200 transition-all">
-                    </div>
-                    <button onclick="loginAdmin()" class="w-full btn-primary py-4 rounded-xl font-bold mt-4 shadow-lg">เข้าสู่ระบบ</button>
+                    <h2 class="text-2xl font-bold mb-6">ผู้ดูแลระบบ</h2>
+                    <form id="form-login" class="space-y-4 text-left">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Username</label>
+                            <input type="text" id="login-user" required class="input-field">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Password</label>
+                            <input type="password" id="login-pass" required class="input-field">
+                        </div>
+                        <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold mt-4">เข้าสู่ระบบ</button>
+                    </form>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- ================= VIEW: ADMIN DASHBOARD ================= -->
+        <section id="view-admin-dashboard" class="view-section">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">ระบบจัดการหลังบ้าน</h2>
+                <div class="flex gap-2">
+                    <button onclick="openCourseModal()" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-600 transition">
+                        <i class="fa-solid fa-plus mr-1"></i> เพิ่มหลักสูตร
+                    </button>
+                    <button onclick="adminLogout()" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition">
+                        ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-ui overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left whitespace-nowrap">
+                        <thead class="bg-gray-800 text-white text-xs uppercase font-semibold">
+                            <tr>
+                                <th class="px-6 py-4">ชื่อหลักสูตร</th>
+                                <th class="px-6 py-4">วันที่อบรม</th>
+                                <th class="px-6 py-4 text-center">ผู้สมัคร</th>
+                                <th class="px-6 py-4 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-course-list" class="divide-y divide-gray-200 text-sm">
+                            <!-- Admin courses injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-16 mt-20">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-12 gap-12">
-            <div class="md:col-span-5 space-y-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 hero-gradient rounded-xl flex items-center justify-center text-white font-bold">R</div>
-                    <h3 class="text-white text-xl font-bold">ARIT RMUTL</h3>
-                </div>
-                <p class="text-sm leading-relaxed max-w-sm">สำนักวิทยบริการและเทคโนโลยีสารสนเทศ มุ่งเน้นการให้บริการด้านสารสนเทศที่มีประสิทธิภาพเพื่อสนับสนุนการเรียนการสอนและการวิจัย</p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-rmutl-orange hover:text-white transition-all"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-rmutl-orange hover:text-white transition-all"><i class="fa-brands fa-line"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-rmutl-orange hover:text-white transition-all"><i class="fa-solid fa-globe"></i></a>
+    <footer class="bg-[#1f2937] text-white pt-10 pb-6 border-t-4 border-rmutl-orange mt-auto">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-8">
+            <div class="max-w-md">
+                <h3 class="text-xl font-bold mb-3">RMUTL <span class="text-rmutl-orange">TRAINING</span></h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-4">ระบบลงทะเบียนและจัดการหลักสูตรอบรม มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา</p>
+                <div class="flex gap-3">
+                    <a href="#" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-rmutl-orange transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-rmutl-orange transition"><i class="fa-solid fa-globe"></i></a>
                 </div>
             </div>
-            <div class="md:col-span-3 space-y-6">
-                <h4 class="text-white font-bold uppercase tracking-widest text-xs">เขตพื้นที่</h4>
-                <ul class="text-sm space-y-3">
-                    <li><a href="#" class="hover:text-white transition-colors">เชียงใหม่ (ห้วยแก้ว/เจ็ดยอด)</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">เชียงราย</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">ลำปาง</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">น่าน</a></li>
-                    <li><a href="#" class="hover:text-white transition-colors">ตาก</a></li>
+            <div>
+                <h4 class="text-lg font-bold mb-3 border-b border-gray-700 pb-2">ติดต่อเรา</h4>
+                <ul class="text-gray-400 text-sm space-y-2">
+                    <li><i class="fa-solid fa-location-dot w-5 text-rmutl-orange"></i> 128 ถ.ห้วยแก้ว ต.ช้างเผือก อ.เมือง จ.เชียงใหม่ 50300</li>
+                    <li><i class="fa-solid fa-phone w-5 text-rmutl-orange"></i> โทรศัพท์ : 0 5392 1444</li>
+                    <li><i class="fa-solid fa-envelope w-5 text-rmutl-orange"></i> อีเมล : saraban@rmutl.ac.th</li>
                 </ul>
             </div>
-            <div class="md:col-span-4 space-y-6">
-                <h4 class="text-white font-bold uppercase tracking-widest text-xs">ติดต่อเรา</h4>
-                <div class="space-y-4 text-sm">
-                    <div class="flex items-start gap-3">
-                        <i class="fa-solid fa-location-dot mt-1 text-rmutl-orange"></i>
-                        <span>128 ถ.ห้วยแก้ว ต.ช้างเผือก อ.เมือง <br>จ.เชียงใหม่ 50300</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-phone text-rmutl-orange"></i>
-                        <span>0 5392 1444 ต่อ 1611</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-envelope text-rmutl-orange"></i>
-                        <span>arit@rmutl.ac.th</span>
-                    </div>
-                </div>
-            </div>
         </div>
-        <div class="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800 text-center text-xs opacity-50">
-            &copy; 2024 Academic Resources and Information Technology, RMUTL. Designed with ❤️ for RMUTLers.
+        <div class="max-w-6xl mx-auto px-6 mt-8 pt-4 border-t border-gray-700 text-center text-xs text-gray-500">
+            © 2024 Rajamangala University of Technology Lanna. All Rights Reserved.
         </div>
     </footer>
 
-    <!-- Modal Detail -->
-    <div id="modal" class="fixed inset-0 bg-slate-900/60 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md transition-all">
-        <div class="glass rounded-[32px] max-w-2xl w-full shadow-2xl overflow-hidden border border-white/20 transform scale-95 transition-transform duration-300" id="modal-container">
-            <div class="p-8 md:p-10" id="modal-content"></div>
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Generic Message Modal -->
+    <div id="modal-msg" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div id="msg-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"></div>
+            <h3 id="msg-title" class="text-xl font-bold mb-2"></h3>
+            <p id="msg-desc" class="text-sm text-gray-500 mb-6"></p>
+            <button onclick="document.getElementById('modal-msg').classList.add('hidden')" class="w-full btn-primary py-2 rounded-lg font-bold">ตกลง</button>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script>
-        const isGAS = typeof google !== 'undefined' && google.script && google.script.run;
+    <!-- Auth Verify Modal (For Edit/Confirm Status) -->
+    <div id="modal-verify" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 class="text-lg font-bold mb-2">ยืนยันตัวตน</h3>
+            <p class="text-sm text-gray-500 mb-4">กรุณากรอกอีเมลที่ใช้ในการลงทะเบียนเพื่อดำเนินการต่อ</p>
+            <input type="email" id="verify-email" class="input-field mb-4" placeholder="ระบุอีเมลของคุณ">
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('modal-verify').classList.add('hidden')" class="w-1/2 py-2 border rounded-lg text-gray-600 text-sm font-bold">ยกเลิก</button>
+                <button onclick="processVerify()" class="w-1/2 py-2 btn-primary rounded-lg text-sm font-bold">ตรวจสอบ</button>
+            </div>
+        </div>
+    </div>
 
-        // Mock Data
-        const mockCourses = [
-            { ID: 1, Title: "Mastering Canva for Education: สร้างสื่อการสอนระดับมืออาชีพ", Speaker: "อ.ศิริพงษ์ รักศิลป์", Date: "25 ต.ค. 2567", Location: "ห้องอบรม IT 1", Target: "อาจารย์และบุคลากร", Content: "การใช้เครื่องมือ AI ใน Canva, การสร้าง Presentation ที่น่าสนใจ, การทำสื่อ Infographic สำหรับการสอน", Objective: "เพื่อให้อาจารย์สามารถผลิตสื่อการสอนได้รวดเร็วและสวยงาม", Note: "มีอาหารกลางวันและเบรคบริการ", MaxSeats: 35, currentReg: 12, status: "เปิดลงทะเบียน" },
-            { ID: 2, Title: "Data Analytics with Excel: จากข้อมูลดิบสู่บทสรุปธุรกิจ", Speaker: "ดร.ณัฐพล มีความรู้", Date: "5 พ.ย. 2567", Location: "ห้องประชุมวิทยบริการ", Target: "นักศึกษาและผู้สนใจ", Content: "Advanced Pivot Tables, Power Query, Data Visualization techniques", Objective: "พัฒนาทักษะการวิเคราะห์ข้อมูลขั้นสูง", MaxSeats: 40, currentReg: 40, status: "เต็มแล้ว" },
-            { ID: 3, Title: "Cybersecurity Awareness 2024: รู้เท่าทันภัยไซเบอร์ใกล้ตัว", Speaker: "ทีมวิศวกรความมั่นคงปลอดภัย", Date: "12 พ.ย. 2567", Location: "Online via MS Teams", Target: "บุคลากร มทร.ล้านนา", Content: "Phishing scams, Password security, Mobile safety", Objective: "เพื่อสร้างภูมิคุ้มกันทางดิจิทัลให้บุคลากร", MaxSeats: 200, currentReg: 85, status: "เปิดลงทะเบียน" }
-        ];
-
-        const mockRegs = [
-            { RegID: "REG-24001", CourseID: 1, Title: "Mastering Canva for Education", Prefix: "นาย", Name: "กิตติพงษ์ สุขใจ", Campus: "เชียงใหม่", Faculty: "คณะวิศวกรรมศาสตร์", Status: "ลงทะเบียนแล้ว" },
-            { RegID: "REG-24002", CourseID: 3, Title: "Cybersecurity Awareness 2024", Prefix: "นางสาว", Name: "นลินทิพย์ มีดี", Campus: "เชียงราย", Faculty: "คณะบริหารธุรกิจและศิลปศาสตร์", Status: "เข้าร่วม" }
-        ];
-
-        const service = {
-            run: (funcName, ...args) => ({
-                withSuccessHandler: (callback) => {
-                    if (isGAS) {
-                        google.script.run.withSuccessHandler(callback)[funcName](...args);
-                    } else {
-                        setTimeout(() => {
-                            if (funcName === 'getCourses') callback(mockCourses);
-                            if (funcName === 'getRegistrations') callback(mockRegs);
-                            if (funcName === 'registerUser') callback("REG-" + Math.floor(Math.random() * 90000 + 10000));
-                            if (funcName === 'updateRegistration') callback(true);
-                        }, 600);
-                    }
-                }
-            })
-        };
-
-        let coursesData = [];
-        let regData = [];
-        let isAdmin = false;
-
-        window.onload = () => {
-            loadCourses();
-            loadRegistrations();
-        };
-
-        function navigate(view, data = null) {
-            const views = ['dashboard', 'register', 'attendees', 'admin-login'];
-            views.forEach(v => {
-                const el = document.getElementById('view-' + v);
-                if (el) el.classList.add('hidden');
-                const nav = document.getElementById('nav-' + v);
-                if(nav) nav.classList.remove('nav-active');
-            });
-
-            const targetView = document.getElementById('view-' + view);
-            if(targetView) {
-                targetView.classList.remove('hidden');
-                window.scrollTo(0, 0);
-            }
-            
-            const nav = document.getElementById('nav-' + view);
-            if(nav) nav.classList.add('nav-active');
-
-            if(view === 'register' && data) {
-                document.getElementById('reg-title').innerText = data.Title;
-                document.getElementById('reg-date').innerText = data.Date;
-                document.getElementById('form-course-id').value = data.ID;
-            }
-        }
-
-        // Admin Login function
-        function loginAdmin() {
-            const user = document.getElementById('admin-user').value;
-            const pass = document.getElementById('admin-pass').value;
-
-            // ตรวจสอบข้อมูล Login
-            if (user === 'admin' && pass === 'admin') {
-                isAdmin = true;
-                const modal = document.getElementById('modal');
-                const content = document.getElementById('modal-content');
-                
-                content.innerHTML = `
-                    <div class="text-center py-10">
-                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                            <i class="fa-solid fa-lock-open"></i>
-                        </div>
-                        <h3 class="text-2xl font-black text-gray-800 mb-2">เข้าสู่ระบบสำเร็จ</h3>
-                        <p class="text-gray-500 mb-8">ยินดีต้อนรับ เจ้าหน้าที่ดูแลระบบ</p>
-                        <button onclick="closeModal(); navigate('attendees')" class="px-10 py-3 btn-primary rounded-xl font-bold">ไปที่หน้าจัดการรายชื่อ</button>
+    <!-- Edit User Modal -->
+    <div id="modal-edit-user" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 class="text-lg font-bold mb-4 border-b pb-2">แก้ไขข้อมูลส่วนตัว</h3>
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1">
+                        <label class="block text-xs font-semibold mb-1">คำนำหน้า</label>
+                        <select id="edit-prefix" class="input-field py-2"><option>นาย</option><option>นาง</option><option>นางสาว</option></select>
                     </div>
-                `;
-                modal.classList.remove('hidden');
-            } else {
-                const modal = document.getElementById('modal');
-                const content = document.getElementById('modal-content');
-                
-                content.innerHTML = `
-                    <div class="text-center py-10">
-                        <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                        <h3 class="text-2xl font-black text-gray-800 mb-2">ข้อมูลไม่ถูกต้อง</h3>
-                        <p class="text-gray-500 mb-8">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</p>
-                        <button onclick="closeModal()" class="px-10 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold">ตกลง</button>
-                    </div>
-                `;
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function loadCourses() {
-            service.run('getCourses').withSuccessHandler(data => {
-                coursesData = data;
-                renderDashboard();
-            });
-        }
-
-        function loadRegistrations() {
-            service.run('getRegistrations').withSuccessHandler(data => {
-                regData = data;
-                renderAttendees();
-            });
-        }
-
-        function renderDashboard() {
-            const grid = document.getElementById('course-grid');
-            if (!grid) return;
-            grid.innerHTML = coursesData.map(c => {
-                const isFull = c.status === 'เต็มแล้ว';
-                return `
-                <div class="card-modern group flex flex-col h-full overflow-hidden shadow-sm">
-                    <div class="h-2 hero-gradient opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="p-8 flex-grow flex flex-col">
-                        <div class="flex justify-between items-start mb-6">
-                            <span class="status-pill ${getStatusClass(c.status)}">${c.status}</span>
-                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-orange-50 group-hover:text-orange-400 transition-colors">
-                                <i class="fa-solid fa-bookmark text-xs"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-black mb-4 group-hover:text-rmutl-orange transition line-clamp-2 leading-tight">${c.Title}</h3>
-                        
-                        <div class="space-y-4 mb-8">
-                            <div class="flex items-center gap-3 text-sm text-slate-500">
-                                <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors">
-                                    <i class="fa-solid fa-chalkboard-user"></i>
-                                </div>
-                                <span>${c.Speaker}</span>
-                            </div>
-                            <div class="flex items-center gap-3 text-sm text-slate-500">
-                                <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white transition-colors">
-                                    <i class="fa-solid fa-calendar-day"></i>
-                                </div>
-                                <span>${c.Date}</span>
-                            </div>
-                            <div class="pt-2">
-                                <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                    <span>ความจุที่นั่ง</span>
-                                    <span>${Math.round((c.currentReg/c.MaxSeats)*100)}% filled</span>
-                                </div>
-                                <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                                    <div class="h-full hero-gradient transition-all duration-1000" style="width: ${(c.currentReg/c.MaxSeats)*100}%"></div>
-                                </div>
-                                <div class="mt-2 text-xs text-slate-400 font-medium">สมัครแล้ว ${c.currentReg} จาก ${c.MaxSeats} ที่นั่ง</div>
-                            </div>
-                        </div>
-
-                        <div class="mt-auto pt-4 flex gap-3">
-                            <button onclick="showCourseDetail('${c.ID}')" class="flex-1 px-4 py-3 border border-gray-100 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all uppercase tracking-wider">รายละเอียด</button>
-                            ${!isFull ? 
-                                `<button onclick="navigate('register', ${JSON.stringify(c).replace(/"/g, '&quot;')})" class="flex-[1.5] btn-primary px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider">ลงทะเบียน</button>` :
-                                `<button disabled class="flex-[1.5] bg-gray-100 text-gray-400 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider cursor-not-allowed">ที่นั่งเต็ม</button>`
-                            }
-                        </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold mb-1">ชื่อ-นามสกุล</label>
+                        <input type="text" id="edit-fullname" class="input-field py-2">
                     </div>
                 </div>
-            `}).join('');
-        }
+                <div>
+                    <label class="block text-xs font-semibold mb-1">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="edit-phone" class="input-field py-2">
+                </div>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="document.getElementById('modal-edit-user').classList.add('hidden')" class="w-1/2 py-2 border rounded-lg text-gray-600 text-sm font-bold">ยกเลิก</button>
+                <button onclick="saveEditUser()" class="w-1/2 py-2 btn-primary rounded-lg text-sm font-bold">บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
 
-        function getStatusClass(status) {
-            if(status === 'เปิดลงทะเบียน') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-            if(status === 'เต็มแล้ว') return 'bg-rose-50 text-rose-600 border border-rose-100';
-            return 'bg-slate-100 text-slate-600';
-        }
-
-        function showCourseDetail(id) {
-            const c = coursesData.find(item => item.ID == id);
-            const modal = document.getElementById('modal');
-            const container = document.getElementById('modal-container');
-            const content = document.getElementById('modal-content');
-            
-            content.innerHTML = `
-                <div class="flex justify-between items-start mb-8">
+    <!-- Admin Course Modal -->
+    <div id="modal-admin-course" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 id="admin-course-title" class="text-xl font-bold mb-4 border-b pb-2">จัดการหลักสูตร</h3>
+            <form id="form-admin-course" class="space-y-4">
+                <input type="hidden" id="c-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">ชื่อหลักสูตร *</label>
+                        <input type="text" id="c-name" required class="input-field py-2">
+                    </div>
                     <div>
-                        <span class="status-pill ${getStatusClass(c.status)} mb-4 inline-block">${c.status}</span>
-                        <h3 class="text-3xl font-black text-gray-800 leading-tight">${c.Title}</h3>
+                        <label class="block text-xs font-semibold mb-1">ชื่อวิทยากร</label>
+                        <input type="text" id="c-speaker" class="input-field py-2">
                     </div>
-                    <button onclick="closeModal()" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-400">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">วันที่จัดอบรม</label>
+                        <input type="text" id="c-date" class="input-field py-2" placeholder="เช่น 15-16 พ.ค. 2567">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">สถานที่จัดอบรม</label>
+                        <input type="text" id="c-location" class="input-field py-2">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">กลุ่มเป้าหมาย</label>
+                        <input type="text" id="c-target" class="input-field py-2">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">เนื้อหาการอบรม</label>
+                        <textarea id="c-content" rows="2" class="input-field py-2"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">วัตถุประสงค์</label>
+                        <textarea id="c-objective" rows="2" class="input-field py-2"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2 grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg border">
+                        <div class="col-span-2 text-sm font-bold border-b pb-1">ตั้งค่าเวลาและจำนวน</div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-green-600">เปิดรับสมัคร</label>
+                            <input type="date" id="c-regStart" class="input-field py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-red-600">ปิดรับสมัคร</label>
+                            <input type="date" id="c-regEnd" class="input-field py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-blue-600">เริ่มยืนยันตัวตน</label>
+                            <input type="date" id="c-confStart" class="input-field py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1 text-blue-600">สิ้นสุดยืนยันตัวตน</label>
+                            <input type="date" id="c-confEnd" class="input-field py-2">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-semibold mb-1">จำนวนรับสมัครสูงสุด (คน) *</label>
+                            <input type="number" id="c-max" required min="1" class="input-field py-2">
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold mb-1">หมายเหตุ / เอกสารโครงการ (Link)</label>
+                        <input type="text" id="c-remarks" class="input-field py-2">
+                    </div>
                 </div>
                 
-                <div class="grid md:grid-cols-2 gap-10">
-                    <div class="space-y-6">
-                        <div class="space-y-1">
-                            <h4 class="text-[10px] font-bold uppercase text-gray-400 tracking-widest">รายละเอียดเนื้อหา</h4>
-                            <p class="text-gray-600 text-sm leading-relaxed">${c.Content}</p>
-                        </div>
-                        <div class="space-y-1">
-                            <h4 class="text-[10px] font-bold uppercase text-gray-400 tracking-widest">วัตถุประสงค์</h4>
-                            <p class="text-gray-600 text-sm leading-relaxed">${c.Objective}</p>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50/80 p-6 rounded-[24px] space-y-4">
-                        <h4 class="text-[10px] font-bold uppercase text-gray-400 tracking-widest">ข้อมูลการจัดงาน</h4>
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-3 text-sm">
-                                <i class="fa-solid fa-user-tie text-rmutl-orange w-4"></i>
-                                <span class="text-gray-700 font-medium">วิทยากร: <span class="font-normal">${c.Speaker}</span></span>
-                            </div>
-                            <div class="flex items-center gap-3 text-sm">
-                                <i class="fa-solid fa-location-dot text-rmutl-orange w-4"></i>
-                                <span class="text-gray-700 font-medium">สถานที่: <span class="font-normal">${c.Location}</span></span>
-                            </div>
-                            <div class="flex items-center gap-3 text-sm">
-                                <i class="fa-solid fa-bullseye text-rmutl-orange w-4"></i>
-                                <span class="text-gray-700 font-medium">กลุ่มเป้าหมาย: <span class="font-normal">${c.Target}</span></span>
-                            </div>
-                            ${c.Note ? `<div class="mt-4 p-3 bg-white/50 border border-gray-100 rounded-lg text-xs italic text-gray-500">หมายเหตุ: ${c.Note}</div>` : ''}
-                        </div>
-                    </div>
+                <div class="flex justify-end gap-2 pt-4 border-t mt-6">
+                    <button type="button" onclick="document.getElementById('modal-admin-course').classList.add('hidden')" class="px-6 py-2 border rounded-lg text-gray-600 text-sm font-bold">ยกเลิก</button>
+                    <button type="submit" class="px-6 py-2 btn-primary rounded-lg text-sm font-bold">บันทึก</button>
                 </div>
+            </form>
+        </div>
+    </div>
 
-                <div class="flex gap-4 mt-10">
-                    <button onclick="closeModal()" class="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-2xl font-bold transition-all">ปิดหน้าต่าง</button>
-                    ${c.status === 'เปิดลงทะเบียน' ? 
-                        `<button onclick="closeModal(); navigate('register', ${JSON.stringify(c).replace(/"/g, '&quot;')})" class="flex-[2] btn-primary py-4 rounded-2xl font-bold shadow-lg">ลงทะเบียนตอนนี้</button>` : ''
-                    }
-                </div>
-            `;
+
+    <script>
+        // ================= CONFIGURATION =================
+        // *** วาง URL ของ Google Apps Script Web App ที่ได้จากขั้นตอนที่ 1 ที่นี่ ***
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyjF1tQ9yk_8GWsd6EIykH0mVlkDlw3OJwvycz7Bth2AjxqV6Alw2xlGFv0cwIogbN/exec"; 
+        
+        // State
+        let dbCourses = [];
+        let dbParticipants = [];
+        
+        let currentVerifyAction = null; // 'confirm', 'cancel', 'edit'
+        let currentVerifyItem = null;   // object data
+        let currentAuthEmail = null;
+
+        // ================= API CALLER =================
+        async function apiCall(action, data = {}) {
+            if(SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyyjF1tQ9yk_8GWsd6EIykH0mVlkDlw3OJwvycz7Bth2AjxqV6Alw2xlGFv0cwIogbN/exec") {
+                showMsg('เกิดข้อผิดพลาด', 'ยังไม่ได้ตั้งค่า SCRIPT_URL กรุณาใส่ URL ของ Web App ในโค้ดก่อนใช้งาน', 'error');
+                return null;
+            }
+
+            document.getElementById('api-loader').classList.remove('hidden');
+            document.getElementById('api-loader').classList.add('flex');
             
-            modal.classList.remove('hidden');
-            setTimeout(() => { container.classList.remove('scale-95'); }, 10);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: action, data: data })
+                });
+                const result = await response.json();
+                document.getElementById('api-loader').classList.add('hidden');
+                document.getElementById('api-loader').classList.remove('flex');
+                
+                if (result.status === 'error') {
+                    showMsg('ข้อผิดพลาด', result.message, 'error');
+                    return null;
+                }
+                return result;
+            } catch (error) {
+                document.getElementById('api-loader').classList.add('hidden');
+                document.getElementById('api-loader').classList.remove('flex');
+                showMsg('การเชื่อมต่อล้มเหลว', 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่', 'error');
+                console.error(error);
+                return null;
+            }
         }
 
-        function renderAttendees() {
-            const body = document.getElementById('attendee-table-body');
-            if (!body) return;
-            body.innerHTML = regData.map((r, i) => `
-                <tr class="hover:bg-slate-50/50 transition-colors group">
-                    <td class="px-8 py-5">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-bold text-gray-300">#${i+1}</span>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${r.Status === 'เข้าร่วม' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}">${r.Status}</span>
+        // ================= NAVIGATION =================
+        function navigate(view) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            
+            // Clear Forms on leave
+            document.getElementById('form-register').reset();
+            document.getElementById('form-login').reset();
+            validateEmailRule();
+
+            // Init Load based on view
+            if(view === 'dashboard') loadDashboard();
+            if(view === 'admin-dashboard') {
+                if(!localStorage.getItem('rmutl_admin')) {
+                    navigate('admin-login');
+                } else {
+                    loadAdminDashboard();
+                }
+            }
+        }
+
+        // ================= UI HELPERS =================
+        function showMsg(title, desc, type = 'success') {
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-desc').innerText = desc;
+            const icon = document.getElementById('msg-icon');
+            if(type === 'success') {
+                icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-emerald-100 text-emerald-500';
+                icon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                icon.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-red-100 text-red-500';
+                icon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            }
+            document.getElementById('modal-msg').classList.remove('hidden');
+        }
+
+        // ================= DASHBOARD =================
+        async function loadDashboard() {
+            document.getElementById('course-grid').innerHTML = '';
+            document.getElementById('dashboard-loading').classList.remove('hidden');
+            
+            // Fetch both courses and participants to calculate occupancy
+            const resC = await apiCall('getCourses');
+            const resP = await apiCall('getParticipants');
+            
+            if(resC) dbCourses = resC.data;
+            if(resP) dbParticipants = resP.data;
+
+            document.getElementById('dashboard-loading').classList.add('hidden');
+            renderDashboardCards();
+        }
+
+        function renderDashboardCards() {
+            const grid = document.getElementById('course-grid');
+            if (dbCourses.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">ยังไม่มีหลักสูตรที่เปิดรับสมัคร</div>`;
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+
+            grid.innerHTML = dbCourses.map(c => {
+                const count = dbParticipants.filter(p => p.courseId == c.id).length;
+                const isFull = count >= c.maxPax;
+                
+                // Logic ปิดรับสมัครตามวันที่
+                let isClosed = false;
+                if(c.regEnd && c.regEnd < today) isClosed = true;
+
+                let btnHTML = '';
+                if (isClosed) {
+                    btnHTML = `<button disabled class="w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-xl mt-4">ปิดรับสมัคร</button>`;
+                } else if (isFull) {
+                    btnHTML = `<button disabled class="w-full py-3 bg-red-100 text-red-600 font-bold rounded-xl mt-4">เต็มแล้ว</button>`;
+                } else {
+                    btnHTML = `<button onclick="openRegister('${c.id}')" class="w-full py-3 btn-primary font-bold rounded-xl mt-4 shadow-lg">ลงทะเบียนเข้าอบรม</button>`;
+                }
+
+                return `
+                <div class="card-ui p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-xs font-bold px-3 py-1 bg-orange-100 text-rmutl-orange rounded-full">เปิดรับ ${c.maxPax} ท่าน</span>
+                            ${c.remarks ? `<a href="${c.remarks}" target="_blank" class="text-xs text-blue-500 hover:underline"><i class="fa-solid fa-download"></i> เอกสาร</a>` : ''}
                         </div>
-                    </td>
-                    <td class="px-8 py-5">
-                        <div class="font-bold text-gray-800">${r.Prefix}${r.Name}</div>
-                        <div class="text-[10px] text-gray-400 mt-0.5 uppercase font-bold tracking-tight">${r.RegID}</div>
-                    </td>
-                    <td class="px-8 py-5">
-                        <div class="text-sm text-gray-600 max-w-xs truncate font-medium">${r.Title}</div>
-                    </td>
-                    <td class="px-8 py-5">
-                        <span class="text-xs px-2 py-1 bg-gray-100 rounded text-gray-500 font-medium">${r.Campus}</span>
-                        <div class="text-[11px] text-gray-400 mt-1">${r.Faculty}</div>
-                    </td>
-                    <td class="px-8 py-5 text-center">
-                        <button onclick="alert('กรุณาติดต่อเจ้าหน้าที่เพื่อจัดการข้อมูล')" class="w-8 h-8 rounded-full border border-gray-100 text-gray-400 hover:text-rmutl-orange hover:border-rmutl-orange transition-all"><i class="fa-solid fa-ellipsis"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 leading-tight">${c.name}</h3>
+                        <div class="space-y-2 text-sm text-gray-600 mb-6">
+                            <p><i class="fa-solid fa-calendar-day w-5 text-gray-400"></i> ${c.trainingDate}</p>
+                            <p><i class="fa-solid fa-location-dot w-5 text-gray-400"></i> ${c.location || '-'}</p>
+                            <p><i class="fa-solid fa-user-tie w-5 text-gray-400"></i> วิทยากร: ${c.speaker || '-'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-xs font-semibold text-gray-500 mb-1">
+                                <span>ลงทะเบียนแล้ว ${count} คน</span>
+                                <span>${Math.round((count/c.maxPax)*100)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                <div class="bg-rmutl-orange h-full rounded-full" style="width: ${(count/c.maxPax)*100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mt-auto">
+                        ${btnHTML}
+                        <button onclick="viewAttendees('${c.id}')" class="w-full py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition">
+                            <i class="fa-solid fa-users mr-1"></i> ตรวจสอบรายชื่อ
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
         }
 
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            const container = document.getElementById('modal-container');
-            container.classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 200);
+        // ================= REGISTER =================
+        function openRegister(id) {
+            const course = dbCourses.find(c => c.id == id);
+            if (!course) return;
+            document.getElementById('reg-course-id').value = course.id;
+            document.getElementById('reg-course-title').innerText = course.name;
+            document.getElementById('reg-course-date').innerText = course.trainingDate;
+            navigate('register');
         }
 
-        function toggleOtherFaculty() {
-            const val = document.getElementById('form-faculty').value;
-            const container = document.getElementById('faculty-other-container');
-            container.classList.toggle('hidden', val !== 'อื่นๆ โปรดระบุ');
+        function validateEmailRule() {
+            const type = document.getElementById('reg-type').value;
+            const emailInput = document.getElementById('reg-email');
+            const hint = document.getElementById('email-hint');
+
+            if (type === 'บุคลากร') {
+                emailInput.pattern = ".*@rmutl\\.ac\\.th$";
+                hint.innerText = "* ต้องใช้โดเมน @rmutl.ac.th เท่านั้น";
+                hint.className = "text-xs text-rmutl-orange mt-1";
+            } else if (type === 'นักศึกษา') {
+                emailInput.pattern = ".*@live\\.rmutl\\.ac\\.th$";
+                hint.innerText = "* ต้องใช้โดเมน @live.rmutl.ac.th เท่านั้น";
+                hint.className = "text-xs text-rmutl-orange mt-1";
+            } else {
+                emailInput.removeAttribute('pattern');
+                hint.innerText = "กรุณาเลือกประเภทก่อน";
+                hint.className = "text-xs text-gray-400 mt-1";
+            }
         }
 
-        function filterAttendees() {
-            const q = document.getElementById('attendee-search').value.toLowerCase();
-            const rows = document.querySelectorAll('#attendee-table-body tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
-            });
-        }
-
-        document.getElementById('regForm').onsubmit = (e) => {
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerText;
             
-            submitBtn.disabled = true;
-            submitBtn.innerText = "กำลังส่งข้อมูล...";
-            submitBtn.classList.add('opacity-70');
-
             const data = {
-                CourseID: document.getElementById('form-course-id').value,
-                Prefix: document.getElementById('form-prefix').value,
-                Name: document.getElementById('form-name').value,
-                Type: document.getElementById('form-type').value,
-                Email: document.getElementById('form-email').value,
-                Campus: document.getElementById('form-campus').value,
-                Faculty: document.getElementById('form-faculty').value === 'อื่นๆ โปรดระบุ' ? document.getElementById('form-faculty-other').value : document.getElementById('form-faculty').value,
-                Phone: document.getElementById('form-phone').value,
-                Allergy: document.getElementById('form-allergy').value
+                courseId: document.getElementById('reg-course-id').value,
+                prefix: document.getElementById('reg-prefix').value,
+                fullName: document.getElementById('reg-fullname').value,
+                type: document.getElementById('reg-type').value,
+                email: document.getElementById('reg-email').value,
+                campus: document.getElementById('reg-campus').value,
+                faculty: document.getElementById('reg-faculty').value,
+                phone: document.getElementById('reg-phone').value,
+                allergy: document.getElementById('reg-allergy').value
             };
 
-            service.run('registerUser', data).withSuccessHandler(regId => {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
-                submitBtn.classList.remove('opacity-70');
-                
-                // Show Success Custom Modal
-                const modal = document.getElementById('modal');
-                const content = document.getElementById('modal-content');
-                content.innerHTML = `
-                    <div class="text-center py-10">
-                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                        <h3 class="text-2xl font-black text-gray-800 mb-2">ลงทะเบียนเรียบร้อยแล้ว</h3>
-                        <p class="text-gray-500 mb-8">รหัสอ้างอิงของคุณคือ <span class="font-bold text-gray-800">${regId}</span> <br>กรุณาตรวจสอบรายละเอียดทางอีเมลที่ระบุไว้</p>
-                        <button onclick="closeModal(); navigate('dashboard')" class="px-10 py-3 btn-primary rounded-xl font-bold">กลับหน้าหลัก</button>
-                    </div>
+            const res = await apiCall('addParticipant', data);
+            if (res) {
+                showMsg('ลงทะเบียนสำเร็จ', 'ระบบได้บันทึกข้อมูลของท่านเรียบร้อยแล้ว');
+                navigate('dashboard');
+            }
+        });
+
+        // ================= ATTENDEES =================
+        function viewAttendees(courseId) {
+            const course = dbCourses.find(c => c.id == courseId);
+            if (!course) return;
+            document.getElementById('att-course-title').innerText = `รายชื่อผู้ลงทะเบียน: ${course.name}`;
+            
+            const list = document.getElementById('attendee-list');
+            const filtered = dbParticipants.filter(p => p.courseId == courseId);
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-400">ยังไม่มีข้อมูล</td></tr>`;
+            } else {
+                list.innerHTML = filtered.map((p, index) => {
+                    let statusBadge = '';
+                    if(p.status === 'ลงทะเบียนแล้ว') statusBadge = '<span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">ลงทะเบียนแล้ว / ยังไม่ยืนยัน</span>';
+                    else if(p.status === 'ยืนยันการเข้าร่วม') statusBadge = '<span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold">ยืนยันเข้าร่วม</span>';
+                    else statusBadge = '<span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold">ยกเลิก</span>';
+
+                    // โชว์ปุ่มยืนยัน เฉพาะคนที่ยังไม่ยกเลิก
+                    let actionBtns = '';
+                    if(p.status !== 'ยกเลิก') {
+                        actionBtns = `
+                            <button onclick='requestVerify("confirm", ${JSON.stringify(p)})' class="text-xs bg-emerald-500 text-white px-2 py-1 rounded hover:bg-emerald-600">ยืนยัน</button>
+                            <button onclick='requestVerify("cancel", ${JSON.stringify(p)})' class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">ยกเลิก</button>
+                            <button onclick='requestVerify("edit", ${JSON.stringify(p)})' class="text-xs text-gray-500 hover:text-rmutl-orange ml-1" title="จัดการข้อมูลส่วนตัว"><i class="fa-solid fa-pen-to-square"></i></button>
+                        `;
+                    }
+
+                    return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">${index + 1}</td>
+                        <td class="px-6 py-4 font-medium text-gray-800">${p.prefix}${p.fullName}</td>
+                        <td class="px-6 py-4 text-gray-500">${p.campus}</td>
+                        <td class="px-6 py-4 text-gray-500 text-xs">${p.faculty}</td>
+                        <td class="px-6 py-4 text-center">${statusBadge}</td>
+                        <td class="px-6 py-4 text-center space-x-1">${actionBtns}</td>
+                    </tr>
+                    `;
+                }).join('');
+            }
+            navigate('attendees');
+        }
+
+        // ================= VERIFICATION & EDIT =================
+        function requestVerify(action, itemData) {
+            currentVerifyAction = action;
+            currentVerifyItem = itemData;
+            document.getElementById('verify-email').value = '';
+            document.getElementById('modal-verify').classList.remove('hidden');
+        }
+
+        async function processVerify() {
+            const email = document.getElementById('verify-email').value.trim();
+            if(!email) { alert("กรุณากรอกอีเมล"); return; }
+            
+            document.getElementById('modal-verify').classList.add('hidden');
+
+            if(currentVerifyAction === 'confirm' || currentVerifyAction === 'cancel') {
+                const newStatus = currentVerifyAction === 'confirm' ? 'ยืนยันการเข้าร่วม' : 'ยกเลิก';
+                const res = await apiCall('updateParticipantStatus', { id: currentVerifyItem.id, email: email, status: newStatus });
+                if(res) {
+                    showMsg('สำเร็จ', 'บันทึกสถานะเรียบร้อยแล้ว');
+                    // Refresh data
+                    const pRes = await apiCall('getParticipants');
+                    if(pRes) { dbParticipants = pRes.data; viewAttendees(currentVerifyItem.courseId); }
+                }
+            } else if (currentVerifyAction === 'edit') {
+                // สำหรับแก้ไข ตรวจสอบเบื้องต้นทางฝั่ง JS ว่าเมลตรงไหม ถ้าตรงเปิด Modal Edit
+                if(email.toLowerCase() === currentVerifyItem.email.toLowerCase()) {
+                    currentAuthEmail = email;
+                    document.getElementById('edit-prefix').value = currentVerifyItem.prefix;
+                    document.getElementById('edit-fullname').value = currentVerifyItem.fullName;
+                    document.getElementById('edit-phone').value = currentVerifyItem.phone;
+                    document.getElementById('modal-edit-user').classList.remove('hidden');
+                } else {
+                    showMsg('ไม่อนุญาต', 'อีเมลไม่ตรงกับข้อมูลที่ลงทะเบียนไว้', 'error');
+                }
+            }
+        }
+
+        async function saveEditUser() {
+            document.getElementById('modal-edit-user').classList.add('hidden');
+            const data = {
+                id: currentVerifyItem.id,
+                authEmail: currentAuthEmail, // ส่งเมลไปยืนยันอีกรอบใน Backend
+                prefix: document.getElementById('edit-prefix').value,
+                fullName: document.getElementById('edit-fullname').value,
+                phone: document.getElementById('edit-phone').value
+            };
+
+            const res = await apiCall('editParticipantInfo', data);
+            if(res) {
+                showMsg('สำเร็จ', 'ปรับปรุงข้อมูลส่วนตัวเรียบร้อยแล้ว');
+                const pRes = await apiCall('getParticipants');
+                if(pRes) { dbParticipants = pRes.data; viewAttendees(currentVerifyItem.courseId); }
+            }
+        }
+
+        // ================= ADMIN =================
+        document.getElementById('form-login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            if(u === 'admin' && p === 'admin') {
+                localStorage.setItem('rmutl_admin', 'true');
+                navigate('admin-dashboard');
+            } else {
+                showMsg('ล้มเหลว', 'Username หรือ Password ไม่ถูกต้อง', 'error');
+            }
+        });
+
+        function adminLogout() {
+            localStorage.removeItem('rmutl_admin');
+            navigate('dashboard');
+        }
+
+        async function loadAdminDashboard() {
+            const resC = await apiCall('getCourses');
+            const resP = await apiCall('getParticipants');
+            if(resC) dbCourses = resC.data;
+            if(resP) dbParticipants = resP.data;
+
+            const tbody = document.getElementById('admin-course-list');
+            if(dbCourses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center">ไม่มีหลักสูตร</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = dbCourses.map(c => {
+                const count = dbParticipants.filter(p => p.courseId == c.id).length;
+                return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-bold">${c.name}</td>
+                    <td class="px-6 py-4">${c.trainingDate}</td>
+                    <td class="px-6 py-4 text-center">${count}/${c.maxPax}</td>
+                    <td class="px-6 py-4 text-center space-x-2">
+                        <button onclick='exportExcel("${c.id}")' class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200"><i class="fa-solid fa-file-excel mr-1"></i> Excel</button>
+                        <button onclick='openCourseModal(${JSON.stringify(c)})' class="text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200">แก้ไข</button>
+                        <button onclick='deleteCourse("${c.id}")' class="text-xs bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200">ลบ</button>
+                    </td>
+                </tr>
                 `;
-                modal.classList.remove('hidden');
-                loadRegistrations();
-            });
-        };
+            }).join('');
+        }
+
+        function openCourseModal(courseData = null) {
+            document.getElementById('form-admin-course').reset();
+            document.getElementById('c-id').value = '';
+            document.getElementById('admin-course-title').innerText = courseData ? 'แก้ไขหลักสูตร' : 'เพิ่มหลักสูตรใหม่';
+            
+            if(courseData) {
+                document.getElementById('c-id').value = courseData.id;
+                document.getElementById('c-name').value = courseData.name || '';
+                document.getElementById('c-speaker').value = courseData.speaker || '';
+                document.getElementById('c-date').value = courseData.trainingDate || '';
+                document.getElementById('c-location').value = courseData.location || '';
+                document.getElementById('c-target').value = courseData.targetGroup || '';
+                document.getElementById('c-content').value = courseData.content || '';
+                document.getElementById('c-objective').value = courseData.objective || '';
+                document.getElementById('c-regStart').value = courseData.regStart ? courseData.regStart.split('T')[0] : '';
+                document.getElementById('c-regEnd').value = courseData.regEnd ? courseData.regEnd.split('T')[0] : '';
+                document.getElementById('c-confStart').value = courseData.confStart ? courseData.confStart.split('T')[0] : '';
+                document.getElementById('c-confEnd').value = courseData.confEnd ? courseData.confEnd.split('T')[0] : '';
+                document.getElementById('c-max').value = courseData.maxPax || '';
+                document.getElementById('c-remarks').value = courseData.remarks || '';
+            }
+            document.getElementById('modal-admin-course').classList.remove('hidden');
+        }
+
+        document.getElementById('form-admin-course').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('modal-admin-course').classList.add('hidden');
+
+            const id = document.getElementById('c-id').value;
+            const data = {
+                name: document.getElementById('c-name').value,
+                speaker: document.getElementById('c-speaker').value,
+                trainingDate: document.getElementById('c-date').value,
+                location: document.getElementById('c-location').value,
+                targetGroup: document.getElementById('c-target').value,
+                content: document.getElementById('c-content').value,
+                objective: document.getElementById('c-objective').value,
+                regStart: document.getElementById('c-regStart').value,
+                regEnd: document.getElementById('c-regEnd').value,
+                confStart: document.getElementById('c-confStart').value,
+                confEnd: document.getElementById('c-confEnd').value,
+                maxPax: document.getElementById('c-max').value,
+                remarks: document.getElementById('c-remarks').value
+            };
+
+            const action = id ? 'editCourse' : 'addCourse';
+            if(id) data.id = id;
+
+            const res = await apiCall(action, data);
+            if(res) {
+                showMsg('สำเร็จ', 'บันทึกข้อมูลหลักสูตรเรียบร้อยแล้ว');
+                loadAdminDashboard(); // Refresh
+            }
+        });
+
+        async function deleteCourse(id) {
+            if(confirm("ยืนยันการลบหลักสูตรนี้? ข้อมูลจะไม่สามารถกู้คืนได้")) {
+                const res = await apiCall('deleteCourse', { id: id });
+                if(res) {
+                    showMsg('สำเร็จ', 'ลบหลักสูตรเรียบร้อยแล้ว');
+                    loadAdminDashboard();
+                }
+            }
+        }
+
+        function exportExcel(courseId) {
+            const course = dbCourses.find(c => c.id == courseId);
+            const filtered = dbParticipants.filter(p => p.courseId == courseId);
+            
+            if (filtered.length === 0) {
+                showMsg('ไม่พบข้อมูล', 'ไม่มีผู้ลงทะเบียนในหลักสูตรนี้', 'error');
+                return;
+            }
+
+            const data = filtered.map((p, index) => ({
+                'ลำดับ': index + 1,
+                'คำนำหน้า': p.prefix,
+                'ชื่อ-นามสกุล': p.fullName,
+                'ประเภท': p.type,
+                'อีเมล': p.email,
+                'คณะ/หน่วยงาน': p.faculty,
+                'เขตพื้นที่': p.campus,
+                'เบอร์โทรศัพท์': p.phone,
+                'อาหารที่แพ้': p.allergy || '-',
+                'สถานะ': p.status,
+                'เวลาลงทะเบียน': p.timestamp
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            // ปรับความกว้างคอลัมน์
+            ws['!cols'] = [{wch:5}, {wch:10}, {wch:25}, {wch:15}, {wch:25}, {wch:30}, {wch:15}, {wch:15}, {wch:20}, {wch:20}, {wch:20}];
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "รายชื่อผู้ลงทะเบียน");
+            XLSX.writeFile(wb, `รายชื่อผู้ลงทะเบียน_${course.name.substring(0,30)}.xlsx`);
+        }
+
+        // ================= INIT =================
+        window.onload = () => navigate('dashboard');
     </script>
 </body>
 </html>
